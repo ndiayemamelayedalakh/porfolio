@@ -1,0 +1,775 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jan 14 11:42:55 2025
+
+@author: ndiaye2410
+"""
+
+import sqlite3
+from openpyxl import Workbook
+from openpyxl.chart import BarChart, PieChart, Reference
+
+##############################################################
+#### Auteurs: Mame Laye Ndiaye, Abdou Khadre Dabo, Mathis Migout, Fatou Alle Diop
+##############################################################
+
+##############################################################
+## Fonctions utilitaires pour dessiner
+# un diagramme à barres et circulaire
+## À NE PAS MODIFIER
+##############################################################
+def generer_bar_chart(ws, titre, titre_x, titre_y):
+    """
+    Génère un graphique à barres (bar chart) et l'insère dans une feuille Excel.
+
+    Paramètres :
+    ------------
+    ws : Worksheet
+        Feuille Excel où les données et le graphique seront ajoutés.
+    titre, titre_x, titre_y : str
+        Titre du graphique à barres, et titres des axes X et Y
+
+    Description :
+    ------------
+    - Les données sont extraites de la feuille Excel à partir des colonnes 1 (catégorie) et 2 (valeurs numériques).
+    - Un graphique à barres est créé, avec les catégories en axe X et les valeurs en axe Y.
+    - Le graphique est ajouté à la cellule G5 de la feuille.
+    """
+    chart = BarChart()
+    chart.type = "col" # graphique à barres verticales (bar pour barres horizontales)
+    chart.title = titre
+    chart.y_axis.title = titre_y
+    chart.x_axis.title = titre_x
+    data = Reference(ws, min_col=2, min_row=1, max_row=ws.max_row, max_col=2)
+    categories = Reference(ws, min_col=1, min_row=2, max_row=ws.max_row)
+    chart.add_data(data, titles_from_data=False)
+    chart.set_categories(categories)
+    chart.height = 12
+    chart.width = 20
+    ws.add_chart(chart, "G5")
+
+
+def generer_pie_chart(ws, titre):
+    """
+    Génère un graphique circulaire (pie chart) et l'insère dans une feuille Excel.
+
+    Paramètres :
+    ------------
+    ws : Worksheet
+        Feuille Excel où les données et le graphique seront ajoutés.
+    titre : str
+        Titre du graphique circulaire.
+
+    Description :
+    ------------
+    - Les données sont extraites de la feuille Excel à partir des colonnes 1 (catégorie) et 2 (valeurs numériques).
+    - Un graphique circulaire est créé, représentant la répartition des catégories.
+    - Le graphique est ajouté à la cellule G5 de la feuille.
+    """
+    chart = PieChart()
+    chart.title = titre
+
+    data = Reference(ws, min_col=2, min_row=1, max_row=ws.max_row, max_col=2)
+    categories = Reference(ws, min_col=1, min_row=2, max_row=ws.max_row)
+    chart.add_data(data, titles_from_data=True)
+    chart.set_categories(categories)
+    chart.height = 12
+    chart.width = 20
+    ws.add_chart(chart, "G5")
+
+##############################################################
+#### Fonctions à compléter pour explorer la BDD
+##############################################################
+
+def ouvrir_connexion_bdd(chemin_bdd):
+    """
+    Établit une connexion à une base de données SQLite.
+    et paramètre les résultats sous forme de dictionnaire
+
+    Paramètres :
+    ------------
+    chemin_bdd : str
+        Chemin du fichier de la base de données SQLite.
+
+    Retourne :
+    ----------
+    sqlite3.Connection
+        Objet de connexion à la base de données si la connexion est réussie.
+    None
+        Si la connexion échoue.
+    """
+    try:
+        connexion = sqlite3.connect(chemin_bdd)
+        connexion.row_factory = sqlite3.Row
+        print("Connexion à la base de données réussie.")
+    except sqlite3.Error as error:
+        print(f"Erreur lors de la fermeture de la connexion : {error}")    
+    return connexion
+
+
+def fermer_connexion_bdd(connexion):
+    """
+    Ferme la connexion à la base de données SQLite et affiche un message
+    si la connexion est fermée, ou aucune connexion active à fermer
+
+    Paramètres :
+    ------------
+    connexion : sqlite3.Connection
+        Objet de connexion à fermer.
+    """
+    if connexion:
+        try:
+            connexion.close()
+            print("Connexion fermée avec succès.")
+        except sqlite3.Error as error:
+            print(f"Erreur lors de la fermeture de la connexion : {error}")
+    else:
+        print("Aucune connexion active à fermer.")
+
+def pourcentage_deces_par_race(connexion):
+    """
+    Calcule et renvoie le pourcentage de personnes tuées par race.
+
+    Paramètres :
+    ------------
+    connexion : sqlite3.Connection
+        Connexion active à la base de données.
+
+    Retourne :
+    ----------
+    dict
+        Dictionnaire contenant le % de décès par race.
+        Format : { 'Race': total_deces }
+    """ 
+    curseur = connexion.cursor() #Recupération du curseur 
+    #Requête de la SQL qui nous permet d'obtenir dde compter 
+    #le nombre total de personnes decédés
+    req = """select count(id_pers) as nbre_deces_total from personnes;"""
+    curseur.execute(req) #Execution de la requête 
+    #Recupérarion du nombre de personne décédés sous format de list
+    #Grace à la fonction fetchone()
+    nbre_total_deces =dict(curseur.fetchone())
+                                             
+    curseur = connexion.cursor() #Récupération du curseur 
+    #Requête de la SQL qui nous permet d'obtenir le nombre de
+    #Décés par race
+    req ="""
+    select nom_complet, count(id_pers) as nbre_deces_races
+    from personnes as p join races as r on p.id_race=r.id_race
+    group by nom_complet order by nbre_deces_races DESC;
+    """
+    curseur.execute(req) #Exécution de la requête
+    #Récupération de toutes les enregistrement grace à la fonction fetchall()
+    deces_par_race = dict(curseur.fetchall()) 
+    #Récupération des pourcentages des décés dans chaque races
+    for races, nbre_deces in deces_par_race.items():
+        deces_par_race[races] = round((nbre_deces*100/nbre_total_deces["nbre_deces_total"]), 2)
+    return deces_par_race
+
+def nombre_deces_par_sexe(connexion):
+    """
+    Calcule et renvoie le nombre de personnes tuées par sexe.
+
+    Paramètres :
+    ------------
+    connexion : sqlite3.Connection
+        Connexion active à la base de données.
+
+    Retourne :
+    ----------
+    dict
+        Dictionnaire contenant le nombre de décès par sexe.
+        Format : { 'Homme': total_deces }
+    """
+    curseur = connexion.cursor() #Récuperation du curseur 
+    #Requête SQL permettant d'avoir le nombre de décés total par sexe
+    req = """
+    select sexe, count(*) as nbre_deces_par_sexe 
+    from personnes group by sexe order by sexe desc;"""
+    curseur.execute(req) #Exécutionn de la requête
+    #Récupération du nombre de décés sous format dictionnaire
+    deces_par_sexe = dict(curseur.fetchmany(2))
+    return deces_par_sexe 
+
+def pourcentage_deces_par_race_etat(connexion):
+
+    # Création d'un curseur pour interagir avec la base de données
+    curseur = connexion.cursor()
+    
+    # Exécution de la requête pour récupérer tous les états (nom complet), triés par ordre alphabétique
+    curseur.execute("SELECT nom_complet FROM etats order by nom_complet;")
+    list_etat = [ligne['nom_complet'] for ligne in curseur.fetchall()] # Récupère tous les états dans une liste
+    
+    # Requête SQL pour récupérer le nombre de décès par état et par race
+    req = """SELECT e.nom_complet AS 'Etat', r.nom_complet AS 'Race' , count(*) as nbre_dece FROM
+                races AS r JOIN personnes AS p on r.id_race = p.id_race
+                JOIN details_incidents AS d on d.id_pers = p.id_pers
+                JOIN adresses a on a.id_adresse = d.id_adresse
+                JOIN etats e on e.id_etat = a.id_etat
+                GROUP by Race , Etat
+                ORDER by Etat;
+            """
+    
+    curseur.execute(req)
+    top_info  = curseur.fetchall() # Récupère toutes les données des décès par race et état
+    
+    info_etat = {} # Initialisation d'un dictionnaire vide pour stocker les informations par état
+    
+    # Remplissage du dictionnaire `info_etat` avec les données
+    for elmt in list_etat:
+        for etat in top_info:
+            etat = dict(etat) # Conversion de chaque ligne de résultats en dictionnaire
+            if etat['Etat'] == elmt:
+                # Si l'état dans la ligne correspond à l'état de la liste, on crée un sous-dictionnaire pour cet état
+               info_etat[elmt] = { etat['Race']:etat['nbre_dece'] # Associe chaque race au nombre de décès
+                                  for etat in top_info if etat['Etat'] == elmt} 
+    
+    # Calcul du pourcentage de décès par race pour chaque état
+    for race_nbre_dece in info_etat.values():
+        nbre_total_dece = [elmt for elmt in race_nbre_dece.values()] # Récupère tous les décès de chaque race
+        dece_total = sum(nbre_total_dece) # Calcule le total des décès pour un état donné
+        for race, dece in race_nbre_dece.items():
+            # Calcule le pourcentage de décès pour chaque race par rapport au total des décès dans l'état
+            if dece_total != 0:
+                race_nbre_dece[race] = round( dece*100 / dece_total,2)
+            else:
+                race_nbre_dece[race] = 0
+            
+    # Liste des races à afficher dans le résultat final        
+    race_a_afficher = ['Black','White','Native American / Alaska Native','Hispanic','Asian']
+    
+    for etat, race_nbre_dece in info_etat.items():# Filtrage des races à afficher
+        info_race = race_nbre_dece
+        for race, prct in info_race.items():
+            # Garde uniquement les races présentes dans `race_a_afficher
+            info_race = {race:prct for race, prct in info_race.items() if race in race_a_afficher}
+            info_etat[etat] = info_race # Met à jour les informations pour chaque état
+            
+    # Renvoie le dictionnaire contenant les informations de décès par race pour chaque état        
+    return info_etat 
+
+def maniere_de_deces_par_sexe(connexion):
+    """
+    Récupère et retourne le nombre de personnes tuées par sexe et par type de décès
+    sous forme de dictionnaire.
+
+    Paramètres :
+    ------------
+    connexion : sqlite3.Connection
+        Objet de connexion à la base de données SQLite.
+
+    Retourne :
+    --------
+    dict
+        Un dictionnaire contenant les statistiques de décès sous cette forme
+
+        {
+            'M': {'maniere1': 10, 'maniere2': 15},
+            'F': {'maniere1': 5, 'maniere3': 8 }
+        }
+    """     
+    curseur = connexion.cursor() #Recupération du curseur 
+    #Requête SQL permettant d'obtenir les differentes maniéres de décés 
+    #En fonction du sexe des victimes
+    req = """SELECT sexe, maniere_de_deces ,count(id_incident) as Nbre_de_deces FROM
+            details_incidents d JOIN personnes p on d.id_pers = p.id_pers
+            GROUP by sexe, maniere_de_deces;
+          """
+    curseur.execute(req) #Exécution de la requête 
+    maniere_dece_nbre = curseur.fetchall()#Récuperation de toutes les enregistrement
+    resultats = {}
+    sexes = ['M','F']
+    for elmt in sexes: #Parcours de la liste sexes
+        for  ligne in  maniere_dece_nbre: #Parcours de la ligne maniere_de_décés
+            ligne = dict(ligne) #Mettre la ligne sous format dictionnaire
+            #Récupération de la maniére et du nombre de décés pour chaque sexe
+            resultats[elmt] = {ligne['maniere_de_deces']:ligne['Nbre_de_deces']
+                               for ligne in maniere_dece_nbre if ligne['sexe'] == elmt}
+
+    return resultats 
+def pourcentage_personnes_armees_ou_non(connexion):
+    """
+    Calcule le pourcentage de personnes tuées par la police qui étaient armées ou non.
+
+    Paramètres :
+    ------------
+    connexion : sqlite3.Connection
+        Connexion active à la base de données.
+
+    Retourne :
+    ----------
+    dict
+        {'armee': pourcentage_armes, 'non_armee': pourcentage_non_armes}
+    """
+    curseur = connexion.cursor() # Création d'un curseur
+    # Requête pour obtenir le nombre total d'incidents où l'arme est connue
+    req = """SELECT count(id_incident) AS statut_connu FROM details_incidents 
+              WHERE arme is NOT NULL AND arme != "undetermined";
+          """
+    curseur.execute(req)
+    total_connu = dict(curseur.fetchone())
+    # Requête pour obtenir le nombre d'incidents où la victime est non armée
+    req = """
+            SELECT count(id_incident) AS vict_non_armee FROM details_incidents
+            WHERE arme = "unarmed" AND arme is NOT NULL;
+          """
+    curseur.execute(req)
+    non_armee = dict(curseur.fetchone())
+    # Calcul des pourcentages des  personnes armees ou non
+    if total_connu['statut_connu'] != 0:  # Verifie si le nbre total de victime est différent de 0
+        prct_non_armee = round(non_armee['vict_non_armee']*100 / total_connu['statut_connu'], 2)
+        prct_armee = 100 - prct_non_armee
+    else:
+        prct_non_armee = 0
+        prct_armee = 0
+    resultats = {} # Variable qui va contenir le resultat
+    resultats['armee'] = prct_armee
+    resultats['non_armee'] = prct_non_armee
+    
+    return resultats
+
+def type_arme_par_personne(connexion):
+    """
+    Récupère le nombre de personnes tuées par type d'arme,
+    en excluant les types d'armes ayant causé moins de 7 décès.
+
+    Paramètres :
+    ------------
+    connexion : sqlite3.Connection
+        Connexion active à la base de données.
+
+    Retourne :
+    ----------
+    Dictionnaire listant les types d'armes et le nombre de décès associés.
+        Seuls les types d'armes ayant causé plus de 6 décès sont pris en compte.
+        Exemple de sortie :
+        { 'gun': 1200, 'knife': 800, 'unarmed': 600, ... }
+    """
+    # Etablir la connexion avec la base de donnees
+    conn = connexion
+    curseur = conn.cursor()
+    
+    # Requete pour récupérer le type d'arme et le nombre de victime
+    req = """SELECT arme, count(id_incident) as nbre_de_victime
+            from details_incidents
+            GROUP by arme
+            HAVING nbre_de_victime >= ?;
+          """
+    curseur.execute(req, (7,))
+    # Retourner le résultat sous forme de dictionnaire
+    return dict(curseur.fetchall())
+
+def deces_armes_afeu_vs_non_armes(connexion):
+    """
+    Calcule le nombre de personnes tuées par la police armées d'une arme à feu ou non armées.
+
+    Paramètres :
+    ------------
+    connexion : sqlite3.Connection
+        Connexion active à la base de données.
+
+    Retourne :
+    ----------
+    dict
+        {'arme_afeu': total_armes, 'non_arme': total_non_armes}
+    """
+    
+    
+    curseur = connexion.cursor()
+    req ="""SELECT 
+            CASE
+            WHEN arme LIKE "%gun%" THEN "arme_afeu"
+            WHEN  arme = "unarmed" THEN "non_arme"
+            END AS deces_armes_afeu_vs_non_armes, COUNT(id_pers) AS nbre_deces
+            FROM details_incidents
+            WHERE deces_armes_afeu_vs_non_armes IS NOT NULL
+            GROUP BY deces_armes_afeu_vs_non_armes
+        """
+    curseur.execute(req)
+    nbre_deces_armes_afeu_vs_non_armes = [dict(ligne) for ligne in curseur.fetchall()]
+    dict_armes = {ligne['deces_armes_afeu_vs_non_armes'] : ligne ['nbre_deces'] for ligne in nbre_deces_armes_afeu_vs_non_armes }
+    return dict_armes
+    
+    
+    
+def deces_par_tranche_age(connexion):
+    """
+    Calcule et renvoie le nombre de personnes tuées par la police,
+    réparties par tranches d'âge. Il faut utiliser CASE WHEN et créer
+    les catégories suivantes: '1-20', '21-30', '31-40', '41-50', '51-60'
+    et '61+'
+
+    Paramètres :
+    ------------
+    connexion : sqlite3.Connection
+        Connexion active à la base de données.
+
+    Retourne :
+    ----------
+    dict
+        Dictionnaire contenant le nombre de décès par tranche d'âge.
+        Exemple : {'1-20': 120, '21-30': 350, '31-40': 290}
+    """
+    curseur = connexion.cursor()
+    req = """SELECT COUNT(id_pers) AS nbre_deces,
+             CASE 
+             WHEN age BETWEEN 1 AND 20 THEN "1-20"
+             WHEN age BETWEEN 21 AND 30 THEN "21-30"
+             WHEN age BETWEEN 31 AND 40 THEN "31-40"
+             WHEN age BETWEEN 41 AND 50 THEN "41-50"
+             WHEN age BETWEEN 51 AND 60 THEN "51-60"
+             WHEN age > 60 THEN "61+"
+             END AS deces_par_tranche_age
+             FROM personnes 
+             WHERE deces_par_tranche_age IS NOT NULL
+             GROUP BY  deces_par_tranche_age
+        """
+    curseur.execute(req)
+    nbre_deces_par_tranche_age = [dict(ligne) for ligne in curseur.fetchall()]
+    dict_deces_par_tranche_age = {ligne['deces_par_tranche_age'] : ligne ['nbre_deces'] for ligne in nbre_deces_par_tranche_age }
+    return nbre_deces_par_tranche_age
+
+def pourcentage_maladie_mentale(connexion):
+    """
+    Calcule le pourcentage de personnes tuées par la police ayant été diagnostiquées
+    avec une maladie mentale.
+
+    Paramètres :
+    ------------
+    connexion : sqlite3.Connection
+        Connexion active à la base de données.
+
+    Retourne :
+    ----------
+    dict
+        {'avec_maladie_mentale': pourcentage, 'sans_maladie_mentale': pourcentage}
+    """
+    curseur = connexion.cursor()
+    req_1 = """SELECT COUNT(id_pers) AS nbre_malade ,
+             CASE
+             WHEN signes_de_maladie_mentale = 1 THEN "avec_maladie_mentale"
+             ELSE  "sans_maladie_mentale"
+             END AS "avec_sans_maladie_mentale"
+             FROM details_incidents
+             GROUP BY "avec_sans_maladie_mentale";
+        """
+
+    req_2 = """SELECT count(signes_de_maladie_mentale) AS nbre_malade_mentale
+            FROM details_incidents
+            """
+    curseur.execute(req_1)
+    nbre_malade_mentale = [dict(ligne) for ligne in curseur.fetchall()]
+    curseur.execute(req_2)
+    dico_total = dict(curseur.fetchone())
+    total = dico_total["nbre_malade_mentale"]
+    pourcentage_nbre_deces_maladie_mentale = {ligne['avec_sans_maladie_mentale'] : round((ligne ['nbre_malade'] / total) * 100,2) for ligne in nbre_malade_mentale}
+    return pourcentage_nbre_deces_maladie_mentale
+
+def top_etats_dangereux(connexion, limite=5):
+    """
+    Renvoie les 5 états avec le plus grand nombre de décès causés par la police.
+
+    Paramètres :
+    ------------
+    connexion : sqlite3.Connection
+        Connexion active à la base de données.
+    limite : int
+        Nombre d'états à retourner (par défaut 5).
+
+    Retourne :
+    ----------
+    dict
+        {'État': nombre de décès}
+    """
+    cursor = connexion.cursor()
+    query = """
+    SELECT e.nom_complet AS etat, COUNT(*) AS deces
+    FROM details_incidents di
+    JOIN adresses a ON di.id_adresse = a.id_adresse
+    JOIN etats e ON a.id_etat = e.id_etat
+    GROUP BY e.nom_complet
+    ORDER BY deces DESC
+    LIMIT ?;
+    """
+    cursor.execute(query, (limite,))
+    result = cursor.fetchall()
+    return {row[0]: row[1] for row in result}
+
+def top_villes_dangereuses(connexion, limite=10):
+    """
+    Renvoie les 10 villes avec le plus grand nombre de décès causés par la police.
+
+    Paramètres :
+    ------------
+    connexion : sqlite3.Connection
+        Connexion active à la base de données.
+    limite : int
+        Nombre de villes à retourner (par défaut 10).
+
+    Retourne :
+    ----------
+    dict
+        {'Ville, État': nombre de décès}
+    """
+    cursor = connexion.cursor()
+    query = """
+    SELECT a.ville || ', ' || e.abreviation AS ville_etat, COUNT(*) AS deces
+    FROM details_incidents di
+    JOIN adresses a ON di.id_adresse = a.id_adresse
+    JOIN etats e ON a.id_etat = e.id_etat
+    GROUP BY a.ville, e.abreviation
+    ORDER BY deces DESC
+    LIMIT ?;
+    """
+    cursor.execute(query, (limite,))
+    result = cursor.fetchall()
+    return {row[0]: row[1] for row in result}
+
+def analyse_menace_fuite(connexion):
+    """
+    Analyse le nombre de décès en fonction du niveau de menace et de la fuite.
+
+    Paramètres :
+    ------------
+    connexion : sqlite3.Connection
+        Connexion active à la base de données.
+
+    Retourne :
+    ----------
+    dict
+        Dictionnaire contenant les décès par niveau de menace et fuite.
+    """
+    pass
+
+def deces_par_mois_annee(connexion):
+    """
+    Calcule le nombre de décès par mois et par année pour détecter des tendances.
+
+    Paramètres :
+    ------------
+    connexion : sqlite3.Connection
+        Connexion active à la base de données.
+
+    Retourne :
+    ----------
+    dict
+        Dictionnaire contenant le nombre de décès par mois pour chaque année.
+    """
+    pass
+
+############################################################
+###### Programme principal pour tester vos fonctions
+###### et insérer dans le fichier excel
+############################################################
+if __name__ == "__main__":
+
+    chemin_bdd = "victimes_police_US.db"
+    connexion = ouvrir_connexion_bdd(chemin_bdd)
+    # Test et sauvegarde de la fonction pourcentage_deces_par_race()
+    deces_par_race = pourcentage_deces_par_race(connexion)
+    print(deces_par_race)
+    wb = Workbook()
+    wb.remove(wb.active)
+    ws1 = wb.create_sheet("Décés par Race", 0)
+    ws1.append(['Race', 'Pourcentage'])
+    for Race, Pourcentage in deces_par_race.items():
+        ws1.append([Race, Pourcentage])
+    generer_pie_chart(ws1, titre="Répartition décés par race")
+    
+    #Test et sauvegarde de la fonction nombre_deces_par_sexe()
+    
+    nbre_deces_sexe = nombre_deces_par_sexe(connexion)
+    print(nbre_deces_sexe)
+    #Création du classeur
+    
+    ws2 = wb.create_sheet("Décés par sexe", 1)
+    ws2.append(['Sexe', 'Nombre de tués'])
+    for Sexe, Nombre_de_tués in nbre_deces_sexe.items():
+        ws2.append([Sexe, Nombre_de_tués])
+    generer_bar_chart(ws2, titre="Répartition des décés par sexe", titre_x="Sexe", titre_y="Nombre de tués") 
+    
+    #Test et sauvegarde de la fonction maniere_de_deces_par_sexe
+    
+    resultats = maniere_de_deces_par_sexe(connexion)
+    print(resultats)
+    
+    ws3 = wb.create_sheet('Modes de décés Par Sexe')
+    ws3.append(['Sexe', 'Mode de deces', 'Nombre de cas'])
+    conn = sqlite3.connect('victimes_police_US.db')
+    curseur = conn.cursor()
+    for sex, maniere_nbre in resultats.items():
+        for maniere, nbre in maniere_nbre.items():
+            ws3.append([sex, maniere, nbre ])
+            
+    #Test et sauvegarde de la fonction pourcentage_personnes_armees_ou_non  
+    
+    armee_ou_non = pourcentage_personnes_armees_ou_non(connexion)
+    print(armee_ou_non)
+    
+    ws4 = wb.create_sheet('Victimes Armees ou Non')
+    ws4.append(['Statut', 'Pourcentage'])
+    for statut, prct in armee_ou_non.items():
+        if statut == 'armee':
+            ws4.append(['Armée',prct])
+        else:
+            ws4.append(['Non armée',prct])
+    generer_pie_chart(ws4,'Répartition entre les victimes armées et non armées')
+            
+    #Test et sauvegarde de la fonction type_arme_par_personne()
+    
+    dece_par_type_arme = type_arme_par_personne(connexion)
+    print(dece_par_type_arme)
+    
+    ws5 = wb.create_sheet("Victimes par Type d'Arme")
+    ws5.append(["Type d’Arme", "Nombre de Victimes"])
+    for type_arme, nbre_victime in dece_par_type_arme.items():
+        ws5.append([type_arme, nbre_victime])
+    generer_bar_chart(ws5, "Répartition des décès selon le type d'arme",
+                      titre_x="Type d’Arme", titre_y="Nombre de Victimes" )
+    
+    ##Test et sauvegarde de la fonction deces_armes_afeu_vs_non_armes
+    
+    nbre_deces_armes_afeu_vs_non_armes = deces_armes_afeu_vs_non_armes(connexion)
+    print(nbre_deces_armes_afeu_vs_non_armes)
+    
+    ws6 = wb.create_sheet("Victimes par Type d'Arme1")
+    ws6.append(['Statut','Nombre de victimes'])
+    for cle , valeur in nbre_deces_armes_afeu_vs_non_armes.items() :
+        ws6.append([cle,valeur])
+    generer_pie_chart(ws6, "La proportion de victimes armées et non armées")
+    
+    ##Test et sauvegarde de la fonction deces_par_tranche_age()
+    
+    nbre_deces_par_tranche_age = deces_par_tranche_age(connexion)
+    print(nbre_deces_par_tranche_age)
+    
+    ws7 = wb.create_sheet("Décés par tranche d'age")
+    ws7.append(["Tranche d'age",'Nombre de victimes'])
+    for cle , valeur in nbre_deces_par_tranche_age.items() :
+        ws7.append([cle,valeur])
+    generer_bar_chart(ws7, "La répartution des décés par tranche d'age", "tranche d'age", "Nombre de victimes")
+    
+    ##Test et sauvegarde de la fonction pourcentage_maladie_mentale()
+    
+    pourcentage_nbre_deces_maladie_mentale = pourcentage_maladie_mentale(connexion)
+    print(pourcentage_nbre_deces_maladie_mentale)
+    
+    ws8 = wb.create_sheet("Troubles mentaux")
+    ws8.append(['Statut','Pourcentage'])
+    for cle , valeur in pourcentage_nbre_deces_maladie_mentale.items() :
+        ws8.append([cle,valeur])
+    generer_pie_chart(ws8, "La répartition de victimes avec maladie mentale et sans maladie mentale")
+    
+     #Test et sauvegarde de la fonction pourcentage_deces_par_race_etat
+     
+    race_etat = pourcentage_deces_par_race_etat(connexion)
+    print(race_etat)
+    
+    ws9 = wb.create_sheet('Décès par Race et État')
+    liste_races = []
+    for etat, dict_race in race_etat.items():
+        for race in dict_race.keys():
+            if race not in liste_races:
+                liste_races.append(race)
+    
+    ws9.append(["Etats"] + liste_races)
+    # Ajouter les donnees pour chaque Etat
+    for etat, dict_race in race_etat.items():
+        ligne = [etat]  # Commence par le nom de l'Etat
+        for race in liste_races:
+                # Ajouter le pourcentage correspondant ou Vide si la race n'est pas prÃ©sente pour cet Ã‰tat
+                ligne.append(dict_race.get(race, 0))
+        ws9.append(ligne)      
+     
+    #Test et sauvegarde de la fonction top_etats_dangereux()
+    
+    result_etats = top_etats_dangereux(connexion, limite=5)
+    
+    ws10 = wb.create_sheet("États Dangereux")
+
+    # Ajout des en-têtes
+    ws10.append(["État", "Nombre de Victimes"])
+
+    # Ajout des données
+    for etat, deces in result_etats.items():
+        ws10.append([etat, deces])
+
+    # Ajout d'un graphique en barres
+    generer_bar_chart(ws10 , titre="États les Plus Dangereux", 
+                      titre_x="États", titre_y="Nombre de Victimes")
+
+    #Test et sauvegarde de la fonction top_villes_dangereuses()
+    
+    result_villes = top_villes_dangereuses(connexion)
+    print(result_villes)
+
+    # Création du tableau Excel
+    ws11 = wb.create_sheet("Villes Dangereuses")
+
+    # Ajout des en-têtes
+    ws11.append(["Ville", "Nombre de Victimes"])
+
+    # Ajout des données
+    for ville, deces in result_villes.items():
+        ws11.append([ville, deces])
+    # # Ajout d'un graphique en barres
+    generer_bar_chart(ws11, titre="Villes les Plus Dangereuses",
+                      titre_x="Villes", titre_y="Nombre de Victimes")
+    
+    #Test et sauvegarde de la fonction analyse_menace_fuite()
+    
+    
+
+    
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+     
+
+    
+
+            
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+    # #Tester chaque fonction à part, insérer une nouvelle feuille dans
+    # # le classeur et générer les graphiques demandés
+
+
+    # #Sauvegarde et génération de fichier Excel
+    wb.save('resultats_analyse.xlsx')
+    print("Exportation et visualisation terminées.")
