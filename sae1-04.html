@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Projet Jeux Olympiques</title>
+  <link rel="stylesheet" href="style2.css">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-okaidia.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+
+</head>
+</head>
+<body>
+  <header>
+    <h1>Analyse Médicale : Création de Base de Données Relationnelle
+  à partir de Données de Santé Synthétiques</h1>
+    
+  </header>
+
+  <section>
+    <h2>Présentation du projet</h2>
+    <p>
+Ce projet consistait à créer une <strong>base de données relationnelle</strong> à partir de <strong>données de santé synthétiques</strong>. 
+Le but était de simuler le travail d’un gestionnaire de données médicales : 
+nettoyer et préparer les données avec <strong>Python</strong> (Pandas, NumPy), concevoir un <strong>MCD</strong> et un <strong>MLD</strong>, 
+implémenter la base dans <strong>MySQL</strong> et analyser les résultats, tout en garantissant l’intégrité et la cohérence des données.
+</p>
+
+
+    <h2>Organisation et démarche</h2>
+<p>
+Le projet consistait à nettoyer et préparer le fichier <code>jeu_donnees_sante.csv</code> 
+pour l’insertion dans une base de données relationnelle. 
+<br>Les principales étapes réalisées étaient les suivantes :
+</p>
+
+<ul class="acquis-list">
+  <li>Chargement des données dans un <strong>DataFrame Pandas</strong> et vérification des types de données (dates, numériques).</li>
+  <li>Gestion des <strong>valeurs manquantes</strong> : imputation de la valeur la plus fréquente pour <em>Insurance Provider</em> et de la valeur la moins fréquente pour <em>Medication</em>.</li>
+  <li>Correction des incohérences et erreurs typographiques : uniformisation des noms des patients et médecins, standardisation des conditions médicales, nettoyage des noms d’hôpitaux.</li>
+  <li>Détection et suppression des <strong>doublons</strong> si leur taux était inférieur à 10%.</li>
+  <li>Vérification des <strong>valeurs aberrantes</strong> et correction si nécessaire (ex. valeurs négatives dans <em>Billing Amount</em>).</li>
+  <li>Utilisation éventuelle de <strong>fonctions auxiliaires</strong> pour organiser et automatiser le nettoyage des données.</li>
+</ul>
+Cet extrait de code illustre concrètement le nettoyage.
+   <pre><code class="language-python">
+            def nettoyer_et_inverser(nom):
+            """
+            Nettoie une chaîne de caractères représentant un nom, supprime les mots non pertinents,
+            capitalise chaque mot, puis inverse l'ordre pour afficher le nom de famille en premier.
+
+            
+            Étapes :
+            - Supprime les points et les espaces superflus
+            - Élimine les mots présents dans la liste `a_supprimer` (comparés en minuscules)
+            - Capitalise chaque mot
+            - Inverse l'ordre : "Prénom Nom" devient "Nom Prénom"
+            - Si un seul mot est présent, il est retourné tel quel
+            - Si aucun mot pertinent n'est trouvé, retourne np.nan
+
+            Paramètres :
+            ----------
+            nom : str
+                Chaîne de caractères à nettoyer et réorganiser.
+
+            Retour :
+            -------
+            str ou np.nan
+                Nom réorganisé sous la forme "Nom Prénom", ou np.nan si la chaîne est vide ou non pertinente.
+            """
+
+
+            nom = nom.replace('.', '')  # Enlève les points
+            nom = ' '.join(nom.split())  # Nettoie les espaces
+            mots = nom.strip().split()
+            
+            # Supprimer les mots à exclure (en comparant en minuscules)
+            mots = [m for m in mots if m.lower() not in a_supprimer]
+
+            # Capitaliser proprement chaque mot
+            mots = [m.capitalize() for m in mots]
+
+            if len(mots) >= 2:
+                prenom = ' '.join(mots[:-1])
+                nom_famille = mots[-1]
+                return nom_famille + " " + prenom
+            elif len(mots) == 1:
+                return mots[0]
+            else:
+                return np.nan
+        # Appliquer la fonction aux colonnes
+        df_sante['Doctor'] = df_sante['Doctor'].apply(nettoyer_et_inverser)
+        df_sante['Name'] = df_sante['Name'].apply(nettoyer_et_inverser)
+
+   </code> </pre>
+
+
+
+  <h2>Acquis</h2>
+<p>
+Ce projet m’a permis de renforcer mes compétences en <strong>gestion et analyse de données médicales</strong> 
+en utilisant pleinement <strong>Python</strong> et ses bibliothèques <strong>Pandas</strong> et <strong>NumPy</strong>. 
+<br>J’ai également appris à concevoir un <strong>MCD</strong> (Modèle Conceptuel de Données) et un <strong>MLD</strong> (Modèle Logique de Données) 
+pour structurer correctement une base relationnelle dans <strong>MySQL</strong>.
+</p>
+
+<ul class="acquis-list">
+  <li>Maîtrise du <strong>nettoyage, standardisation et préparation de données</strong> à partir de fichiers CSV pour les rendre exploitables.</li>
+  <li>Compétence dans la <strong>gestion des valeurs manquantes et aberrantes</strong> pour garantir l’intégrité des données.</li>
+  <li>Capacité à <strong>concevoir un MCD et un MLD</strong> pour une base relationnelle cohérente et efficace.</li>
+  <li>Expérience pratique dans <strong>l’insertion et l’extraction de données</strong> depuis MySQL avec Python.</li>
+  <li>Développement de <strong>fonctions Python modulaires</strong> pour automatiser le nettoyage, la préparation et l’analyse des données.</li>
+  <li>Renforcement du <strong>travail collaboratif</strong> et de la planification de projets de données complexes.</li>
+</ul>
+
+
+   <!-- Boutons de téléchargement -->
+<a href="Scripts/netoyage.html" target="_blank">Voir une partie du script de la gestion du BDD</a>
+  </section>
+
+  </section>
+
+  <footer>
+    <p><a href="index.html">Retour à l’accueil</a></p>
+  </footer>
+</body>
+</html>

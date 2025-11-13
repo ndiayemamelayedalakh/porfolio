@@ -201,7 +201,7 @@ footer a {
     .download-btn {
       display: inline-block;
       padding: 12px 25px;
-      background: #3498db;
+      background: #7209b7;
       color: white;
       text-decoration: none;
       border-radius: 5px;
@@ -213,16 +213,16 @@ footer a {
     }
 
     .download-btn:hover {
-      background: #2980b9;
+      background: #7209b7;
       transform: translateY(-2px);
     }
 
     .download-btn.pdf {
-      background: #e74c3c;
+      background: #7209b7;
     }
 
     .download-btn.pdf:hover {
-      background: #c0392b;
+      background: #7209b7;
     }
 
     .download-btn::before {
@@ -236,3 +236,17 @@ footer a {
     .download-btn.script::before {
       content: "💻";
     }
+
+    body {
+  background: linear-gradient(135deg, #f0f0f0, #e4e6eb);
+  padding: 40px 0;
+}
+
+main {
+  background: white;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 50px;
+}
