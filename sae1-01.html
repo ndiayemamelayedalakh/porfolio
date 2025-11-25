@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <title>Projet Reporting dans un SGBD</title>
   <link rel="stylesheet" href="style2.css">
+   <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-okaidia.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
 </head>
 <body>
   <header>
@@ -25,7 +28,49 @@
 3. <b>Visualisation </b>: Création de tableaux et graphiques synthétiques pour illustrer les résultats.<br>
 4. <b>Export</b> : Génération d’un fichier Excel structuré avec les données et visualisations.<br>
 5. <b>Validation </b>: Vérification des résultats et documentation pour garantir leur fiabilité.</p>
-    <img src="Images/SAE11.png" alt="Illustration" height="350" width="100%">
+Voici un extrait de code pour illustrer notre travail.
+<pre><code class="language-python">
+  def pourcentage_personnes_armees_ou_non(connexion):
+    """
+    Calcule le pourcentage de personnes tuées par la police qui étaient armées ou non.
+
+    Paramètres :
+    ------------
+    connexion : sqlite3.Connection
+        Connexion active à la base de données.
+
+    Retourne :
+    ----------
+    dict
+        {'armee': pourcentage_armes, 'non_armee': pourcentage_non_armes}
+    """
+    curseur = connexion.cursor() # Création d'un curseur
+    # Requête pour obtenir le nombre total d'incidents où l'arme est connue
+    req = """SELECT count(id_incident) AS statut_connu FROM details_incidents 
+              WHERE arme is NOT NULL AND arme != "undetermined";
+          """
+    curseur.execute(req)
+    total_connu = dict(curseur.fetchone())
+    # Requête pour obtenir le nombre d'incidents où la victime est non armée
+    req = """
+            SELECT count(id_incident) AS vict_non_armee FROM details_incidents
+            WHERE arme = "unarmed" AND arme is NOT NULL;
+          """
+    curseur.execute(req)
+    non_armee = dict(curseur.fetchone())
+    # Calcul des pourcentages des  personnes armees ou non
+    if total_connu['statut_connu'] != 0:  # Verifie si le nbre total de victime est différent de 0
+        prct_non_armee = round(non_armee['vict_non_armee']*100 / total_connu['statut_connu'], 2)
+        prct_armee = 100 - prct_non_armee
+    else:
+        prct_non_armee = 0
+        prct_armee = 0
+    resultats = {} # Variable qui va contenir le resultat
+    resultats['armee'] = prct_armee
+    resultats['non_armee'] = prct_non_armee
+    
+    return resultats
+</code></pre>
 
     <h2>Acquis</h2>
   <ul class="acquis-list">
@@ -42,7 +87,7 @@
    <!-- Boutons de téléchargement -->
 <div class="download-buttons">
       <a href="Raapports/Rapport_Mathis_Mame_Abdou_Fatou.pdf" class="download-btn pdf" target="_blank">Lire le rapport PDF</a>
-      <a href="Scripts/script.final.txt" class="download-btn script" target="_blank">Voir le script</a>
+      <a href="Scripts/script_sae1-01.html" class="download-btn script" target="_blank">Voir le script</a>
     </div>
   </section>
 

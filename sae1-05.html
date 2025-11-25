@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Analyse des accidents en Normandie</title>
+  <link rel="stylesheet" href="style2.css">
+   <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-okaidia.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Analyse des accidents corporels de la circulation survenus en Normandie</h1>
+  </header>
+
+  <section>
+    <h2>Présentation du projet</h2>
+    <p>Ce projet repose sur l’analyse de données issues des accidents corporels de la circulation
+        survenus en Normandie entre 2019 et 2023. Les données, mises à disposition par l’Observatoire
+        National Interministériel de la Sécurité Routière (ONISR), ont été exploitées pour explorer les
+        tendances, identifier les principaux facteurs de risque, et mieux comprendre la répartition des
+        victimes selon différents critères (gravité, sexe, catégorie de route, âge, conditions de circulation,
+        localisation, etc.). L’approche adoptée s’appuie sur des outils de traitement et de visualisation
+        sous R, avec pour objectif de fournir une lecture claire et structurée des phénomènes observés
+        sur cette période.</p>
+
+<h2>Démarche</h2>
+<p><ol>
+  <li><b>Importation et préparation des données</b> : <br>
+    - Chargement des fichiers ONISR dans R.<br>
+    - Vérification des types de variables et nettoyage des données (doublons, valeurs manquantes).<br>
+    - Filtrage géographique pour ne conserver que les accidents en Normandie.<br>
+    - Harmonisation des libellés pour faciliter l’analyse.
+  </li>
+
+  <li><b>Exploration statistique</b> :<br> 
+    - Calcul d’indicateurs descriptifs (nombre d’accidents, victimes, gravité).<br>
+    - Visualisation de l’évolution annuelle (2019–2023).<br>
+    - Comparaison entre départements normands.<br>
+    - Étude de l’impact de facteurs externes (météo, heure, type de route).
+  </li>
+
+  <li><b>Analyse des victimes</b> : <br>
+    - Répartition par sexe et par tranche d’âge.<br>
+    - Gravité des blessures (indemnes, blessés légers, graves, tués).<br>
+    - Identification des profils vulnérables (jeunes, seniors, piétons, cyclistes).
+  </li>
+
+  <li><b>Analyse statistique approfondie</b> : <br>
+    - Tests statistiques pour mettre en évidence des relations entre variables.<br>
+    - Interprétation des tendances et discussion des biais possibles.
+  </li>
+
+  <li><b>Restitution</b> : <br>
+    - Rapport complet en LaTeX avec graphiques et tableaux.<br>
+    - Présentation orale avec Marp, orientée vers la clarté et la pédagogie.<br>
+    - Mise en avant des résultats clés et recommandations pour la sécurité routière.
+  </li>
+</ol></p>
+Voici un extrait de graphique pour illustrer notre travail.
+ <div style="text-align: center;">
+  <img src="Images/sae1-05.png.png" alt="Illustration" height="400" width="600">
+</div>
+
+    <h2>Acquis</h2>
+<p>
+  Ce projet m’a permis de développer des compétences solides en <b>manipulation et préparation
+     de données</b>, notamment l’importation, le nettoyage et la transformation de jeux de données
+      complexes. J’ai renforcé ma capacité à concevoir des <b>visualisations claires et pertinentes
+      </b> afin d’explorer et de communiquer efficacement les résultats. Sur le plan analytique, 
+      j’ai exercé la <b>formulation de questions précises</b>, l’application de <b>méthodes 
+        statistiques</b> pour identifier des relations entre variables, ainsi que l’<b>
+          interprétation structurée des résultats</b>. Enfin, ce travail a consolidé une <b>
+            approche méthodique et rigoureuse</b>, allant de l’exploration initiale à la restitution
+             synthétique des conclusions, démontrant ma capacité à mener une <b>analyse de bout en 
+              bout</b>.
+</p>
+   <!-- Boutons de téléchargement -->
+<div class="download-buttons">
+      <a href="Raapports/Rapport_2-06.pdf" class="download-btn pdf" target="_blank">Lire le rapport PDF</a>
+      <a href="Scripts/script_sae1-01.html" class="download-btn script" target="_blank">Voir le script</a>
+    </div>
+  </section>
+
+  <footer>
+    <p><a href="index.html">Retour à l’accueil</a></p>
+  </footer>
+</body>
+</html>

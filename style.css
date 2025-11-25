@@ -1,135 +1,224 @@
-/* Police Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+/* ——————————————————————————
+   TYPO & COULEURS MOODLE
+—————————————————————————— */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+:root {
+  --bg: #f5f5f7;
+  --text: #23252a;
+  --primary: #1177d1;  /* bleu Moodle */
+  --primary-hover: #0e63ad;
+  --card-bg: #ffffff;
+  --border: #dcdce0;
+  --shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+
+/* ——————————————————————————
+   GLOBAL
+—————————————————————————— */
 
 body {
   font-family: 'Inter', sans-serif;
+  background: var(--bg);
   margin: 0;
-  padding: 0;
-  background: #f4f6f9;
-  color: #333;
-  line-height: 1.6;
+  color: var(--text);
 }
 
+
+/* ——————————————————————————
+   HEADER (style Moodle Dashboard)
+—————————————————————————— */
+
 header {
-  background: linear-gradient(135deg, #004080, #0066cc);
-  color: white;
-  padding: 40px 20px;
+  background: linear-gradient(135deg, #0e63ad, #1177d1);
+  padding: 45px 20px;
   text-align: center;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  color: white;
+  box-shadow: var(--shadow);
 }
 
 header h1 {
   margin: 0;
-  font-size: 2.5em;
+  font-size: 2.5rem;
+  font-weight: 700;
 }
 
 header p {
-  margin: 5px 0;
-  font-size: 1.1em;
+  opacity: 0.9;
+  margin-top: 10px;
 }
+
+
+/* ——————————————————————————
+   NAVIGATION
+—————————————————————————— */
 
 nav {
   background: #ffffff;
-  border-bottom: 1px solid #ddd;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 nav ul {
+  margin: 0;
+  padding: 12px 0;
   list-style: none;
   display: flex;
   justify-content: center;
-  padding: 10px 0;
-  margin: 0;
-  flex-wrap: wrap;
-}
-
-nav ul li {
-  margin: 0 15px;
+  gap: 35px;
 }
 
 nav ul li a {
   text-decoration: none;
-  color: #004080;
+  color: var(--text);
   font-weight: 600;
-  transition: color 0.3s;
+  padding: 8px 2px;
+  position: relative;
 }
 
 nav ul li a:hover {
-  color: #0066cc;
+  color: var(--primary);
 }
 
+nav ul li a::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: var(--primary);
+  transition: 0.3s;
+}
+
+nav ul li a:hover::after {
+  width: 100%;
+}
+
+
+/* ——————————————————————————
+   SECTIONS
+—————————————————————————— */
+
 section {
-  max-width: 900px;
+  background: var(--card-bg);
+  max-width: 1100px;
   margin: 40px auto;
-  padding: 0 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  padding: 35px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
 }
 
 section h2 {
-  color: #004080;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 5px;
+  margin: 0 0 20px 0;
+  font-size: 1.6rem;
+  color: var(--primary);
+  font-weight: 700;
 }
 
-section ul {
-  padding-left: 20px;
-}
 
-footer {
-  background: #004080;
-  color: white;
-  text-align: center;
-  padding: 15px;
-  margin-top: 40px;
-  font-size: 0.9em;
-}
+/* ——————————————————————————
+   GRILLE “TYPE MOODLE”
+—————————————————————————— */
+
 .sae-grid {
-  padding: 40px 20px;
-  text-align: center;
-}
-
-.sae-grid h2 {
-  font-size: 2em;
-  color: #004080;
-  margin-bottom: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px;
 }
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  max-width: 1000px;
-  margin: 0 auto;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
 }
 
 .sae-card {
-  background: white;
+  background: #fff;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  padding: 20px;
-  transition: transform 0.3s ease;
+  padding: 25px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  position: relative;
+  transition: 0.25s ease;
 }
 
 .sae-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.10);
 }
 
 .sae-card h3 {
-  color: #0066cc;
-  margin-bottom: 10px;
+  color: var(--primary);
+  margin-top: 0;
+  font-weight: 600;
 }
 
 .sae-card p {
-  font-size: 0.95em;
-  color: #555;
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.5;
 }
 
+
+/* Bouton "voir plus" style Moodle */
 .sae-card a {
   display: inline-block;
-  margin-top: 10px;
+  margin-top: 15px;
   text-decoration: none;
-  color: #004080;
-  font-weight: bold;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.sae-card a:hover {
+  color: var(--primary-hover);
+}
+
+
+/* ——————————————————————————
+   BOUTONS DE TÉLÉCHARGEMENT
+—————————————————————————— */
+
+.download-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.download-btn {
+  background: var(--primary);
+  border: none;
+  padding: 12px 20px;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.25s;
+  font-size: 0.95rem;
+}
+
+.download-btn:hover {
+  background: var(--primary-hover);
+}
+
+
+/* ——————————————————————————
+   FOOTER
+—————————————————————————— */
+
+footer {
+  background: #ffffff;
+  border-top: 1px solid var(--border);
+  padding: 25px;
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: 40px;
+  color: #555;
 }
