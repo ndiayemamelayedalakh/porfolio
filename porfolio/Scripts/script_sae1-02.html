@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Script R JO</title>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-r.min.js"></script>
+  <style>
+    body {
+      background-color: #dce3ed;
+      font-family: "Source Code Pro", monospace;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .rstudio-window {
+      width: 80%;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      background: #f3f5f7;
+    }
+
+    .rstudio-header {
+      background: linear-gradient(to right, #2e77bb, #1f5d99);
+      color: white;
+      padding: 8px 12px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .rstudio-header span {
+      font-size: 14px;
+    }
+
+    .rstudio-tabs {
+      display: flex;
+      background: #e6ebf0;
+      border-bottom: 1px solid #c1c7ce;
+    }
+
+    .rstudio-tab {
+      padding: 8px 16px;
+      cursor: pointer;
+      border-right: 1px solid #c1c7ce;
+      background: #e6ebf0;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .rstudio-tab.active {
+      background: white;
+      font-weight: bold;
+      border-bottom: 2px solid #2e77bb;
+    }
+
+    pre {
+      margin: 0;
+      padding: 10px;
+      background: white;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="rstudio-window">
+    <div class="rstudio-header">
+      <span>RStudio — Projet : JO_Analyse.R</span>
+    </div>
+    <div class="rstudio-tabs">
+      <div class="rstudio-tab active">Source</div>
+      <div class="rstudio-tab">Console</div>
+      <div class="rstudio-tab">Environnement</div>
+      <div class="rstudio-tab">Help</div>
+    </div>
+</head>
+<body>
+<pre><code class="language-r">
+#------------------------------------------------------------------------------#
+# Contexte : Analyse les données relatives aux Jeux Olympiques d’été concernant la France
+# Auteurs : Victor Boudet, Morade Oseni, Mame Laye Ndiaye, Mamadou Hamady Lom
+# Date : 05/11/2024
+# Données : Résultats des athlètes ayant participé aux Jeux Olympiques Modernes
+# Source : https://ecampus.unicaen.fr/pluginfile.php/1652802/mod_folder/content/0/athlete_events.csv?forcedownload=1
+#------------------------------------------------------------------------------#
+
+# Installation du package lubridate
+
+library(lubridate)
+
+# Lecture des données du fichier
+
+readLines(con = "../Data/athlete_events.csv",
+          n = 10)
+
+# Chargement des données du fichier
+
+dataset = read.table(file = "../Data/athlete_events.csv",
+                     sep = ",",
+                     header = TRUE,
+                     encoding = "UTF-8",
+                     quote = "\"")
+
+# -----------------------------------------------------------------------------#
+# ------------------------- Préparation des données ---------------------------#
+
+# Modification du type de certaines variables dans les données
+
+within(dataset,
+       {
+         Sex = as.factor(Sex);
+         Team = as.factor(Team);
+         NOC = as.factor(NOC);
+         Season = as.factor(Season);
+         Games = as.factor(Games);
+         City =  as.factor(City);
+         Sport = as.factor(Sport);
+         Event = as.factor(Event);
+         Medal = as.factor(Medal);
+       }) -> dataset
+
+# Retrait de la variables ID dans les données
+
+dataset = subset(dataset,
+              select = -c(ID))
+
+# visualisation des modifications effectuées
+
+View(dataset) 
+                
+str(dataset)
+
+# Visualisation du résume des données importées 
+
+summary(dataset)
+
+# Sélection des athlètes français ayant participés au JO d'été dans les données
+
+Work.dataset = subset(dataset[dataset$Team == "France" & dataset$Season == "Summer", ])
+
+# Rétrait des variables Team, NOC et Season dans les données
+
+Work.dataset = subset(Work.dataset,
+                 select = -c(Team,
+                             NOC,
+                             Season))
+
+# Visualisation des modification effectuées
+
+head(Work.dataset)
+
+str(Work.dataset)
+
+# Affichage du résumé des modifications effectuées sur les données
+
+summary(Work.dataset)
+
+#------------------------------------------------------------------------------#
+
+# Répartition en pourcentage des hommes et des femmes au cours des 120 ans des Jeux Olympiques d'été pour la France
+
+# Création d'un tableau data_sex ne contenant uniquement que le sexe des athlètes français
+
+data_sex = subset(Work.dataset,
+                  select = c(Sex))
+
+# Visualisation des modifications effectuées
+
+View(data_sex)
+
+# Edition de la répartition des hommes et des femmes sous forme de pourcentage
+
+levels(data_sex$Sex) <- c("Femme", "Homme")
+
+table1 = round(100*prop.table(table(data_sex$Sex)),2)
+
+print(table1)
+
+# Création d'un diagramme à barre verticale de la répartition des hommes et des femmes en pourcentage
+
+graph1 = barplot(table1,
+                 col= "skyblue",
+                 ylim = c(0,100),
+                 main = "Répartition des hommes et des femmes français\n ayant participés aux Jeux Olympiques",
+                 xlab = "Sexes",
+                 ylab = "Pourcentage")
+text(graph1,
+     table1+3,
+     labels = paste0(table1, "%"))
+
+#------------------------------------------------------------------------------#
+
+# Top 5 des sports les plus représentés en terme d'effectif concernant la France
+
+# Création d'un tableau contenant le nombre d'occurrences de chaque sport
+
+top_sports <- as.data.frame(table(Work.dataset$Sport))
+
+# Changement du nom les variables de la table1
+
+colnames(top_sports) <- c("Sport","Effectifs")
+
+# Triage par nombre d'occurrences et sélection du TOP 5 des sports les plus représentés en terme d'effectif
+
+top_sports[order(top_sports$Effectifs,
+                 decreasing = TRUE),
+           c("Sport","Effectifs")] -> top_5_sport
+
+# Réglage de des marges du graphique "graph2"
+
+par(mar = c(5,10.4,4.1,2.1))
+
+# Création du diagramme à barre horizontale représentant le TOP 5 des sports les plus représentés en terme d'effectif
+
+graph2 = barplot(top_5_sport$Effectifs[1:5],
+        names.arg = top_5_sport$Sport[1:5],
+        horiz = TRUE,
+        las = 1,
+        col = "chocolate",
+        main = "Top 5 des sports les plus répresentés en terme\n d'effectifs par les athlètes francais",
+        xlab = "Effectifs",
+        xlim = c(0,2000))
+text(x = top_5_sport$Effectifs[1:5]+80,
+     y = graph2,
+     labels = paste0(top_5_sport$Effectifs[1:5]),
+     cex = 1)
+
+#------------------------------------------------------------------------------#
+
+# La répartion des athlètes français selon l'attribution ou non d'une médaille 
+
+# Création d'un tableau ne contenant qu'uniquement la répartion des athlètes français selon l'attribution d'une médaille
+
+medals = data.frame(table(Work.dataset$Medal))
+
+colnames(medals) <- c("Medailles","Effectifs")
+
+#calcul de la somme des NA dans la variable Medal dans les données
+
+somme_na = sum(is.na(Work.dataset$Medal))
+
+#calcule de la somme total des athlètes français ayant réçu une médaille
+
+somme_medaille <- sum(medals$Effectifs)
+
+# Création d'une tableau ne contenant qu'uniquement la répartion des athlètes français selon l'attribution ou non d'une médaille
+
+table3 = data.frame(Statuts = c("Athlètes sans médaille","Athlètes avec médaille"), 
+                    Effectifs = c(somme_na, somme_medaille))
+
+#calcul de la somme total des athlètes français ayant participés au JO d'été 
+
+total_effectif = sum(table3$Effectifs)
+
+#Calcul du de la distribution des athlètes ayant réçu ou non une médaille
+
+pourcentage_1 = round((table3$Effectifs / total_effectif) * 100,2)
+
+# Création du diagramme à barres verticales représentant la répartion des athlètes français selon l'attribution ou non d'une médaille 
+
+graph3 = barplot(pourcentage_1,
+                 names.arg = table3$Statuts,
+                 col= "green4",
+                 ylim = c(0,100),
+                 main = "Répartion des athlètes français selon l'attribution ou non d'une médaille",
+                 xlab = "Statuts",
+                 ylab = "Pourcentage")
+text(graph3,
+     pourcentage_1+3,
+     labels = paste0(pourcentage_1, "%"))
+
+#------------------------------------------------------------------------------#
+
+#  La répartition des athlètes français médaillés selon le type de médaille obtenue
+
+# Triage les données par Effectifs et en ne conservant que les variables nécessaires
+
+medals = medals[order(medals$Effectifs),
+                c("Medailles", "Effectifs")] -> medals
+
+# Création du diagramme à barres verticales représentant la répartion des athlètes français selon le type de médaille obtenue
+
+pourcentage_2 = round((medals$Effectifs / sum(medals$Effectifs)) * 100,2)
+
+graph4 = barplot(pourcentage_2,
+                 names.arg = medals$Medailles,
+                 col= c("gold","grey80","chocolate"),
+                 ylim = c(0,50),
+                 main = "Répartition des athlètes français médaillés selon\n le type de médaille obtenue",
+                 xlab = "Médaille",
+                 ylab = "Pourcentage")
+
+text(graph4,
+     pourcentage_2+3,
+     labels = paste0(pourcentage_2, "%"))
+
+#------------------------------------------------------------------------------#
+# La répartition des athlètes français selon l’âge de participation aux Jeux Olympiques d’été 
+
+# Définition des classes d'âge 
+
+subset(Work.dataset,
+       subset = Work.dataset$Age <= 85) -> data_age
+
+data_age$Age.classe = cut(data_age$Age,
+                         breaks = c(0,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85),
+                         include.lowest = TRUE)
+
+# Création d'un histogramme représentant la distribution de l'âge des athlètes français aux Jeux Olympiques d'été
+
+par(mar = c(5,10.4,4.1,2.1))
+
+graph5 = hist(data_age$Age,
+     probability = FALSE,
+     breaks = c(10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85),
+     col = "beige",
+     ylim = c(0,4000),
+     main = "Distribution de l'âge des athlètes français\n aux Jeux Olympiques d'été",
+     xlab = "Âge des athlètes",
+     axes = FALSE,
+     las = 1,
+     ylab = "Effectif (en milliers)")
+
+
+# Personnalisation des abscisses et des ordonnés
+
+axis(side = 1,
+     at = c(10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85),
+     labels = c(0,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85))
+
+axis(side = 2,
+     at = c(0,1000,2000,3000,4000),
+     labels = c(0,1,2,3,4))
+
+# Affichage des quatiles,de la médiane et des pourcentages de a distribution de l'âge des athlètes français aux Jeux Olympiques d'été sur l'histogramme
+
+abline(v = quantile(x = Work.dataset$Age,
+                    probs = c(0.25,0.5,0.75),
+                    na.rm = TRUE),
+       lty = 3,
+       col = c("red","blue"),
+       lwd = 2)
+
+text(x = quantile(x = Work.dataset$Age,
+                  probs = c(0.25,0.5,0.75),
+                  na.rm = TRUE),
+     y = c(2000,1),
+     cex = 0.7,
+     col = c("red","blue"),
+     labels = c("Q1 : 22 ans", "Médiane : 25 ans", "Q3 : 30 ans"))
+
+text(graph5$mids,
+     graph5$counts+200,
+     cex = 0.8,
+     col = 'lightgreen',
+     labels=paste0(round(100*graph5$counts/sum(graph5$counts),2),"%"))
+    
+#------------------------------------------------------------------------------#
+#  la répartition des athlètes français ayant participé aux Jeux Olympiques d’été selon leur taille exprimée en centimètres
+
+# Selection des données concernant la taille des athlètes et rétrait des données NULL
+
+height = na.omit(Work.dataset$Height)
+
+# Création de la courbe de densité répresentant la distribution de la taille des athlètes français\n aux Jeux Olympiques d'été
+
+densite = density(height, bw=3)
+
+plot(densite,
+     col = "green4",
+     lwd = 1.7,
+     main = "Distribution de la taille des athlètes français\n aux Jeux Olympiques d'été",
+     ylab = "Densité",
+     xlab = "Taille des athlètes (en cm)")
+
+abline(v = quantile(x = Work.dataset$Height,
+                    probs = c(0.25,0.5,0.75),
+                    na.rm = TRUE),
+       lty = 3,
+       col = c("red","blue"),
+       lwd = 2)
+
+text(x = quantile(x = Work.dataset$Height,
+                  probs = c(0.25,0.5,0.75),
+                  na.rm = TRUE),
+     y = c(0.005,0.01),
+     cex = 0.8,
+     col = c("red","blue"),
+     labels = c("Q1 : 169 cm", "Médiane : 175 cm", "Q3 : 183 cm"))
+
+
+# -------- FIN --------  
+</code></pre>             
+</body>
+</html>

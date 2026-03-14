@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Script Accidents Normandie</title>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-r.min.js"></script>
+  <style>
+    body {
+      background-color: #dce3ed;
+      font-family: "Source Code Pro", monospace;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .rstudio-window {
+      width: 80%;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      background: #f3f5f7;
+    }
+
+    .rstudio-header {
+      background: linear-gradient(to right, #2e77bb, #1f5d99);
+      color: white;
+      padding: 8px 12px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .rstudio-header span {
+      font-size: 14px;
+    }
+
+    .rstudio-tabs {
+      display: flex;
+      background: #e6ebf0;
+      border-bottom: 1px solid #c1c7ce;
+    }
+
+    .rstudio-tab {
+      padding: 8px 16px;
+      cursor: pointer;
+      border-right: 1px solid #c1c7ce;
+      background: #e6ebf0;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .rstudio-tab.active {
+      background: white;
+      font-weight: bold;
+      border-bottom: 2px solid #2e77bb;
+    }
+
+    pre {
+      margin: 0;
+      padding: 10px;
+      background: white;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="rstudio-window">
+    <div class="rstudio-header">
+      <span>RStudio — Projet : Corporels_accidents.R</span>
+    </div>
+    <div class="rstudio-tabs">
+      <div class="rstudio-tab active">Source</div>
+      <div class="rstudio-tab">Console</div>
+      <div class="rstudio-tab">Environnement</div>
+      <div class="rstudio-tab">Help</div>
+    </div>
+</head>
+<body>
+<pre><code class="language-r">
+# ============================================================================ #
+# Contexte : Analyse exploratoire des accidents corporels de la circulation en Normandie
+# Auteurs : Oseni Morade ; Mame Laye Ndiaye ; Abou Khadre Dabo ; Mamadou Hamady Lom
+# Date : 30/04/2025
+# Source : https://www.data.gouv.fr/fr/datasets/bases-de-donnees-annuelles-des-accidents-
+# corporels-de-la-circulation-routiere-annees-de-2005-a-2023/
+# ============================================================================ #
+
+# ----------------------  Importation des données ----------------------
+
+#Charger les données à partir d’un fichier RDS
+data = readRDS(file = "Data/Accidents.rds")
+
+# Afficher la structure du jeu de données (types de colonnes, aperçu des valeurs)
+str(data)
+
+#Afficher des statistiques descriptives globales
+summary(data)
+
+# ----------------------  Transformation de colonnes ----------------------
+
+#Renommer certaines colonnes et convertir des types
+data <- within(data, {
+  Lumière <- lum       # Renommer la variable 'lum' en 'Lumière' (plus lisible)
+  lum <- NULL          # Supprimer l'ancienne colonne 'lum'
+  mois <- factor(mois) # Transformer la variable 'mois' en facteur
+})
+
+# ----------------------  Filtrage des départements normands ----------------------
+
+#Garder uniquement les lignes correspondant aux départements de la Normandie
+normandie <- subset(data, dep %in% c(14, 27, 50, 61, 76))
+
+# Remplacer les codes des départements par leurs noms
+normandie$dep <- factor(normandie$dep,
+                        levels = c(14, 27, 50, 61, 76),
+                        labels = c("Calvados", "Eure", "Manche", "Orne", "Seine-Maritime"))
+
+#----------------------  Nettoyage des valeurs manquantes ----------------------
+
+#Remplacer la modalité -1 (valeur invalide) par NA dans les colonnes 'grav' et 'sexe',
+#puis convertir ces variables en facteurs
+normandie <- within(normandie, {
+  grav[grav == -1] <- NA     # Valeurs invalides en NA
+  grav <- factor(grav)       # Conversion en facteur
+  sexe[sexe == -1] <- NA
+  sexe <- factor(sexe)
+})
+
+#----------------------  Création d’une variable dérivée ----------------------
+
+# Calculer l’âge de la victime au moment de l’accident (année accident - année naissance)
+normandie$age <- as.numeric(normandie$Year - normandie$an_nais)
+
+#----------------------  Suppression des doublons ----------------------
+
+#Identifier les doublons
+duplicated(normandie)
+
+#Supprimer les lignes dupliquées
+normandie <- normandie[!duplicated(normandie), ]
+
+#----------------------  Vérification finale ----------------------
+
+#Statistiques descriptives finales après nettoyage
+summary(normandie)
+
+#Structure finale du dataframe
+str(normandie)
+summary(normandie$Year)
+
+#Installation de la librairaie lsr
+install.packages("lsr")
+library(lsr)
+
+###################################################################################
+###############################Question-1#########################################
+##################################################################################
+#Compter le nombre de victimes d’accidents par année
+victime_par_an <- table(normandie$Year)
+victime_par_an
+
+# Diagramme à barres
+graph1 = barplot(victime_par_an ,
+                 col = "skyblue",
+                 ylim = c(0,7000),
+                 las = 1,
+                 main = "Évolution du nombre de victimes d'accidents en Normandie",
+                 xlab = "Année",
+                 ylab = "Nombre de victimes")
+#Etiquettes
+text(graph1,
+     victime_par_an  + 200,
+     labels = victime_par_an )
+
+#Texte d'information
+mtext("BUT Science des données",
+      side = 1, adj = 0, line=4, cex = 0.8,col = 'black')
+mtext("Source: data.gouv.fr",
+      side = 1, adj = 1, line=4, cex = 0.8,col = 'black')
+
+###################################################################################
+###############################Question-2#########################################
+##################################################################################
+# Filter les usagers blessés ou tués
+corporels_usagers <- normandie[normandie$grav %in% c(2, 3, 4) & normandie$catr %in% c(1,2,3,4,6,7), ]
+
+#Enlever les doublons d'accidents
+corporels_accidents <- corporels_usagers[!duplicated(corporels_usagers$Num_Acc), ]
+subset(corporels_accidents,
+       select = c(grav, Year, Num_Acc)) -> corporels_accidents
+
+#Compter le nombre d'accidents corporels par année
+accidents_par_an <- table(corporels_accidents$Year)
+accidents_par_an
+
+#Diagramme à barres 
+par(mgp = c(4, 1, 0.5), mar = c(5, 6, 5,5), xpd = TRUE)  
+graph1 = barplot(accidents_par_an ,
+                 col = "pink",
+                 ylim = c(0,2500),
+                 las = 1,
+                 main = "Évolution des accidents corporels en Normandie",
+                 xlab = "Année",
+                 ylab = "Nombre d'accidents corporels")
+axis(2, las = 1)
+text(graph1,
+     accidents_par_an  + 110,
+     labels = accidents_par_an )
+
+#Texte d'information
+mtext("BUT 1 - Science des données",
+      side = 1, adj = 0, line = 3.5, cex = 0.8, col = 'black')
+mtext("Source: data.gouv.fr",
+      side = 1, adj = 1, line = 3.5, cex = 0.8, col = 'black')
+
+
+###################################################################################
+###############################Question-3#########################################
+##################################################################################
+#Supprimer les niveaux inutiles dans la variable "dep"
+normandie$dep <- droplevels(normandie$dep)
+
+#Créer le tableau de contingence : nombre de victimes par département et par année
+table3 <- with(normandie, table(dep, Year))
+table3
+
+#Réordonner les départements selon le nombre de victimes en 2019 (si elle existe)
+if ("2019" %in% colnames(table3)) {
+  table3 <- table3[order(table3[, "2019"], decreasing = TRUE), ]
+}
+
+#Mettre en page : graphique + légende à droite
+layout(matrix(1:2, ncol = 2), widths = c(4, 1))
+
+#Marges du graphique
+par(mar = c(5, 4, 4, 1))
+
+#Graphique
+graph3 <- barplot(table3,
+                  beside = FALSE,
+                  col = couleurs <- c("#5C6F68", "#8AA39B", "#95D9C3", "#A4F9C8", "#A7FFF6")[1:nrow(table3)],
+                  main = "Nombre de victimes d'accidents selon \n le département par année",
+                  ylab = "Nombre de victimes",
+                  xlab = "Année",
+                  ylim = c(0, 6000),
+                  las = 1)
+
+#Etiquettes
+y_cum <- apply(table3, 2, cumsum)
+y_bas <- rbind(0, y_cum[-nrow(y_cum), ])
+y_text <- (y_cum + y_bas) / 2
+labels <- as.vector(table3)
+
+#Etiquettes
+text(x = rep(graph3, each = nrow(table3)),
+     y = as.vector(y_text),
+     labels = labels,
+     cex = 0.7,
+     col = "black")
+
+#Texte d'information
+mtext("BUT science des données", side = 1, line = 4, cex = 0.8, at = min(graph3))     
+mtext("Source : data.gouv.fr", side = 1, line = 4, cex = 0.8, at = max(graph3)) 
+
+#Légende
+par(mar = c(0, 0, 0, 0))
+plot.new()
+legend("center", 
+       fill = couleurs <- c("#5C6F68", "#8AA39B", "#95D9C3", "#A4F9C8", "#A7FFF6")[1:nrow(table3)], 
+       legend = rownames(table3), 
+       bty = "n", 
+       cex = 0.9)
+
+###################################################################################
+###############################Question-4#########################################
+##################################################################################
+#Le nombre d’accidents corporels de la circulation selon le département d’une année à l’autre.
+corporels_usagers[!duplicated(corporels_usagers$Num_Acc), ] -> nbr_accidents
+
+#Tableau de Contingence 
+table1 <- with(nbr_accidents, table(Year, dep))
+table1_sorted <- t(apply(table1, 1, function(x) x[order(-x)]))
+table1_sorted <- t(table1_sorted)
+
+departements_ordonnes <- colnames(table1_sorted)
+couleurs_ordonnes <- couleurs[departements_ordonnes]
+
+par(xpd = TRUE, mar = c(5, 4, 4, 8.5))
+
+#Graphique
+bar_pos <- barplot(table1_sorted,
+                   beside = TRUE,
+                   col = c("Seine-Maritime" = "lightblue",
+                           "Calvados" = "cadetblue3",
+                           "Manche" = "cadetblue4",
+                           "Eure" = "cadetblue",
+                           "Orne" = "cadetblue1"),
+                   xlab = "Année",
+                   ylab = "Nombre d’accidents corporels",
+                   ylim = c(0, max(table1_sorted) * 1.2),
+                   main = "Évolution des accidents corporels en Normandie\n selon le département par année",
+                   las = 1)
+
+text(x = bar_pos,
+     y = table1_sorted,
+     labels = round(table1_sorted, 1),
+     pos = 3,
+     cex = 0.8)
+
+#Légende
+legend("topright",
+       inset = c(-0.35, -0.1),  
+       col = c("lightblue", "cadetblue3", "cadetblue4", "cadetblue","cadetblue2"),
+       legend = c("Seine-Maritime", "Calvados", "Manche", "Eure", "Orne"),
+       bty = "n",
+       pch = 15,
+       x.intersp = 0.9,
+       y.intersp = 0.9,
+       cex = 0.9)
+
+#Texte d'information
+mtext("BUT Science des données",
+      side = 1, adj = 0, line=4, cex = 0.8,col = 'black')
+
+mtext("Source: data.gouv.fr",
+      side = 1, adj = 1, line=4, cex = 0.8,col = 'black')
+
+###################################################################################
+###############################Question-5#########################################
+##################################################################################
+#Re-ordonner les niveaux si nécessaire
+atmosph_data = subset(normandie,
+                      select = atm)
+
+levels(atmosph_data$atm) <- c("Non renseigné","Normale", "Pluie légère", "Pluie forte", "Neige",
+                              "Brouillard", "tempête", "Temps éblouissant", "Temps couvert", "Autre")
+
+#Créer la table de fréquence
+atmosph = table(atmosph_data$atm)
+atmosph = atmosph[names(atmosph) != "Non renseigné"]
+atmosph
+
+#Trier dans l'ordre décroissant
+atmosph_sorted = sort(atmosph, decreasing = TRUE)
+
+#Couleurs
+colors = rep("skyblue", length(atmosph_sorted))
+colors[1] = "lightcoral"  # La barre la plus haute
+
+#Graphique
+par(mgp = c(4, 1, 0), mar = c(5, 6, 4, 2))
+
+graph2 = barplot(atmosph_sorted,
+                 col = colors,
+                 ylim = c(0, max(atmosph_sorted) + 2000),
+                 las = 1,
+                 space = 0.2,
+                 main = "Répartition du nombre d'accidents selon la condition atmosphérique",
+                 xlab = "Condition atmosphérique",
+                 ylab = "Nombre d'accidents")
+
+#Etiquettes
+text(graph2,
+     atmosph_sorted + 500,
+     labels = atmosph_sorted)
+
+#Texte d'information
+mtext("BUT 1 - Science des données",
+      side = 1, adj = 0, line = 3.5, cex = 0.8, col = 'black')
+mtext("Source: data.gouv.fr",
+      side = 1, adj = 1, line = 3.5, cex = 0.8, col = 'black')
+
+###################################################################################
+###############################Question-6#########################################
+##################################################################################
+#calcul des fréquences par catégorie de route
+table6 <- table(normandie$catr)
+
+#Fréquences
+freq6 <- round(prop.table(table6) * 100, 2)  # Pourcentages
+
+#Triage des 4 catégories les plus fréquentes
+freq_catr_trie <- sort(freq6, decreasing = TRUE)
+top4_freq <- head(freq_catr_trie, 4)
+top4_freq
+
+#Noms des catégories
+noms_catr <- c("1" = "Autoroute",
+               "2" = "Route nationale",
+               "3" = "Route départementale",
+               "4" = "Voie communale",
+               "5" = "Hors réseau public",
+               "6" = "Parking public",
+               "7" = "Route métropolitaine",
+               "9" = "Autre")
+noms_top4 <- noms_catr[names(top4_freq)]
+
+#Graphique
+par(mar = c(4, 10, 5,6))
+
+bar_positions <- barplot(top4_freq[order(top4_freq)],  # ordre croissant pour affichage du bas vers le haut
+                         names.arg = noms_top4[order(top4_freq)],
+                         horiz = TRUE,
+                         col = c(rep("steelblue",3),'red'),
+                         main = "Top 4 des catégories de routes selon la fréquence d'accidents",
+                         xlab = "Pourcentage",
+                         las = 1, 
+                         xlim = c(0,60) , # pour des noms horizontaux
+                         cex.names = 0.9)   # taille des noms si besoin
+
+#Etiquettes
+text(x = top4_freq[order(top4_freq)],
+     y = bar_positions,
+     labels = paste0(round(top4_freq[order(top4_freq)], 1), "%"),
+     pos = 4,        # position à droite de la barre
+     cex = 0.9,
+     col = "black")
+par(mar = c(5, 4, 3,4))
+
+###################################################################################
+###############################Question-7#########################################
+##################################################################################
+#Créer le tableau de contingence : gravité des victimes par année
+table7 <- with(normandie, table(grav, Year))
+
+#Profil colonne
+cols <- round(100 * prop.table(table7, margin = 2), 2)
+
+n_grav <- nrow(cols)
+labels_gravite <- c("Indemne", "Tué", "Blessé hospitalisé", "Blessé léger")
+
+#Layout : graphique + légende à droite
+layout(matrix(1:2, nrow = 1), widths = c(4, 1))
+
+#Graphique
+par(mar = c(5, 4, 5, 1))
+graph7 <- barplot(cols,
+                  beside = TRUE,
+                  col = c("bisque", "bisque2", "bisque3", "bisque4"),
+                  ylim = c(0, 50),
+                  main = "Répartition en pourcentage des victimes selon la gravité\n des bléssures en Normandie au cours des 5 dernières années",
+                  ylab = "Pourcentage",
+                  xlab = "Année",
+                  las = 1,
+                  cex.names = 0.8,
+                  axes = TRUE)
+
+#Etiquettes
+text(x = graph7,
+     y = as.vector(cols) + 1.5,
+     labels = paste0(as.vector(cols), "%"),
+     cex = 0.7)
+
+#Texte d'information
+mtext("BUT science des données", side = 1, line = 4, cex = 0.8, at = min(graph7))     
+mtext("Source : data.gouv.fr", side = 1, line = 4, cex = 0.8, at = max(graph7)) 
+
+#Légende 
+par(mar = c(0, 0, 0, 0))
+plot.new()
+legend("center",
+       fill = c("bisque", "bisque2", "bisque3", "bisque4"),
+       legend = labels_gravite[1:n_grav],
+       bty = "n",
+       cex = 0.9)
+
+###################################################################################
+###############################Question-8#########################################
+##################################################################################
+#Affecter normandie à data_grav
+data_grav = normandie
+
+#Mise à jour des niveaux de gravité
+data_grav$grav <- factor(data_grav$grav,
+                         levels = c(1, 2, 3, 4),
+                         labels = c("Indemne", "Tué", "Blessé hospitalisé", "Blessé léger"))
+
+#Tableau de contingence
+table2 = table(data_grav$dep, data_grav$grav)
+dimnames(table2) = list("Département" = rownames(table2),
+                        "Gravité" = colnames(table2))
+
+#Affichage du tableau
+print(table2)
+
+#Table des profils en lignes (en %)
+profils_lignes <- round((prop.table(table2, margin = 1) * 100), 2)
+
+#Transposer la table pour barplot 
+profils_trans <- t(profils_lignes)
+
+#Création du barplot horizontal et récupération des positions
+bp <- barplot(profils_trans,
+              horiz = TRUE,
+              col = c("#E8FAFB", "#b3f2ef", "#A6C6DA", "#9D6"),
+              xlim = c(0, 100),
+              xlab = "Pourcentage",
+              main = "Répartition des victimes selon la gravité des blessures par département",
+              cex.names = 0.7)
+
+#Calcul des positions des textes (au centre de chaque segment)
+cum_vals <- apply(profils_trans, 2, cumsum)
+bar_mids <- cum_vals - profils_trans / 2
+
+#Création des vecteurs pour text()
+x_vals <- as.vector(bar_mids)
+y_vals <- rep(bp, each = nrow(profils_trans))
+labels <- as.vector(profils_trans)
+
+#Etiquettes
+valid <- labels > 0
+text(x = x_vals[valid],
+     y = y_vals[valid],
+     labels = paste0(labels[valid], "%"),
+     cex = 0.6)
+
+#Légende 
+legend("topright",
+       legend = rownames(profils_trans),
+       fill = c("#E8FAFB", "#b3f2ef", "#A6C6DA", "#9D6"),
+       horiz = TRUE,
+       bty = "n",
+       cex = 0.7,
+       inset = c(0, -0.07),
+       xpd = TRUE)
+
+#Texte d'information
+mtext("BUT Science des données",
+      side = 1, adj = 0, line = 3.5, cex = 0.8, col = 'black')
+
+mtext("Source: data.gouv.fr",
+      side = 1, adj = 1, line = 3.5, cex = 0.8, col = 'black')
+
+#Calcul du V de Cramer
+v_cramer = round((cramersV(table2)*100), 2)
+print(v_cramer)
+
+###################################################################################
+###############################Question-9#########################################
+##################################################################################
+#Suppréssion les âges manquants ou aberrants
+normandie_valid_age <- subset(normandie, !is.na(age) & age >= 0 & age <= 110)
+
+#Création de tranche d'âge
+normandie_valid_age$tranche_age <- cut(normandie_valid_age$age,
+                                       breaks = c(0, 17, 29, 44, 59, 74, Inf),
+                                       labels = c("0-17", "18-29", "30-44", "45-59", "60-74", "75+"),
+                                       right = TRUE)
+
+#Tableau de Contingence 
+tab_age_dep = with(normandie_valid_age,table(tranche_age,dep))
+names(dimnames(tab_age_dep)) = c("tranche d'âge","Département")
+print(tab_age_dep)
+sum(tab_age_dep)
+
+#Couleurs
+couleurs <- c("Seine-Maritime" = "#ac5e5e",
+              "Calvados"       = "#a8466d",
+              "Manche"         = "#a42f7d",
+              "Eure"           = "#d66363",
+              "Orne"           = "#460808")
+
+tab_age_dep_sorted <- t(apply(tab_age_dep, 1, function(x) x[order(-x)]))
+tab_age_dep_sorted <- t(tab_age_dep_sorted)
+
+departements_ordonnes <- colnames(tab_age_dep_sorted)
+couleurs_ordonnes <- couleurs[tab_age_dep_sorted]
+
+tab_age_dep_sorted
+
+#Graphique
+bar_plot <- barplot(tab_age_dep_sorted,
+                    beside = TRUE,
+                    col = couleurs,
+                    xlab = "Tranche d'âge",
+                    ylab = "Nombre de victimes",
+                    ylim = c(0, max(tab_age_dep_sorted) * 1.2),
+                    main = "Répartition des victimes selon l'âge par département",
+                    las = 1)
+
+#Etiquettes
+text(x = bar_plot,
+     y = tab_age_dep_sorted,
+     labels = round(tab_age_dep_sorted, 1),
+     pos = 3,
+     cex = 0.8)
+
+#Légende
+legend("topright",
+       inset = c(-0.05, -0.01),  
+       col = c("Seine-Maritime" = "#ac5e5e",
+               "Calvados"       = "#a8466d",
+               "Manche"         = "#a42f7d",
+               "Eure"           = "#d66363",
+               "Orne"           = "#b9323f"),
+       legend = c("Seine-Maritime", "Calvados", "Manche", "Eure", "Orne"),
+       bty = "n",
+       pch = 15,
+       x.intersp = 0.9,
+       y.intersp = 0.9,
+       cex = 0.9)
+
+#Texte d'information
+mtext("BUT Science des données",
+      side = 1, adj = 0, line=4, cex = 0.8,col = 'black')
+mtext("Source: data.gouv.fr",
+      side = 1, adj = 1, line=4, cex = 0.8,col = 'black')
+
+#Calcul du V de Cramer
+cramersV(tab_age_dep_sorted) 
+
+###################################################################################
+###############################Question-10#########################################
+##################################################################################
+#Reclasser les tranches horaires dans l'ordre
+levels(normandie$Classe_horaire) <- c("0h–4h", "4h–8h", "8h–12h", "12h–16h", "16h–20h", "20h–24h")
+
+#Tableau croisé entre tranche horaire et gravité
+tab <- table(normandie$Classe_horaire, normandie$grav)
+
+#Calcul des pourcentages par ligne (chaque tranche horaire)
+tab_pct <- prop.table(tab, margin = 1) * 100
+tab_pct_arrondi <- round(tab_pct, 1)
+
+#Couleurs
+cols <- c("gray", "red", "orange", "skyblue")
+names(cols) <- c("1", "2", "3", "4")
+
+#Ajuster les marges pour la légende
+par(mgp = c(3, 1, 0), mar = c(5, 5, 3, 10), xpd = TRUE) 
+
+# Transposer pour que chaque colonne = une tranche horaire
+tab_to_plot <- t(tab_pct_arrondi)
+tab_to_plot
+
+#Graphique
+Graph6 <- barplot(tab_to_plot,
+                         beside = FALSE,
+                         col = cols,
+                         main = "Répartition en pourcentage des victimes selon la \ngravité  en fonction de la tranche horaire",
+                         xlab = "Tranche horaire",
+                         ylab = "Pourcentage",
+                         ylim = c(0, 100),
+                         xlim = c(0.1, length(accidents_par_an) + 1.5),
+                         names.arg = colnames(tab_to_plot),
+                         las = 1)
+
+#Calcul des hauteurs cumulées pour chaque segment
+heights_cum <- apply(tab_to_plot, 2, cumsum)
+heights_mid <- heights_cum - tab_to_plot / 2
+
+#Etiquettes
+text(x = rep(Graph6, each = nrow(tab_to_plot)),
+     y = as.vector(heights_mid),
+     labels = paste0(as.vector(tab_to_plot), "%"),
+     cex = 0.7)
+
+#Légende
+legend("topright",
+       inset = c(-0.33, 0),
+       legend = c("Indemne", "Tué", "Hospitalisé", "Blessé léger"),
+       fill = cols,
+       bty = "n")
+
+#Texte d'information
+mtext("BUT 1 - Science des données",
+      side = 1, adj = 0, line = 3.5, cex = 0.8, col = 'black')
+mtext("Source: data.gouv.fr",
+      side = 1, adj = 1, line = 3.5, cex = 0.8, col = 'black')
+
+#Calcul du V de cramer
+cramersV(tab)  #  0.05418514
+
+###################################################################################
+###############################Question-11#########################################
+##################################################################################
+
+#Filtrer uniquement les tués
+data_tues <- subset(normandie, grav == 2)
+
+#Reclasser les tranches horaires dans l'ordre
+levels(data_tues$Classe_horaire) <- c("0h–4h", "4h–8h", "8h–12h", "12h–16h", "16h–20h", "20h–24h")
+
+#Tableau de contingence : Classe horaire x Département
+tab = table(data_tues$Classe_horaire, data_tues$dep)
+
+#Préparer la zone graphique : 2 lignes, 3 colonnes
+par(mfrow = c(2, 3), mar = c(4, 4, 4, 1), oma = c(2, 2, 10, 2))  # oma[3] augmenté pour plus d'espace en haut
+
+#Graphique
+for (horaire in rownames(tab)) {
+  effectifs <- tab[horaire, ]
+  
+  graph11 <- barplot(effectifs,
+                     names.arg = colnames(tab),
+                     col = c("#b82020","#1ce4e4","#7d827f","#7abb79","#d2d2d2"),
+                     ylim = c(0, max(tab) + 5),
+                     main = paste("Tranche horaire :", horaire),
+                     xlab = "Département",
+                     ylab = "Nombre de tués",
+                     cex.names = 1)
+  
+#Etiquettes
+  text(x = graph11,
+       y = effectifs + 2,
+       labels = effectifs,
+       cex = 0.9)
+}
+
+#Titre principal
+mtext("Effectifs de tués selon le département pour chaque tranche horaire", 
+      outer = TRUE, line = 5.5, cex = 1.4, font = 2)
+
+#Légende
+par(fig = c(0, 1, 0.97, 1), new = TRUE, mar = c(0, 0, 0, 0))  
+plot.new()
+legend("center",
+       legend = colnames(tab),
+       fill = c("#b82020","#1ce4e4","#7d827f","#7abb79","#d2d2d2"),
+       horiz = TRUE,
+       bty = "n",
+       cex = 1)
+
+#Test du chi² d’indépendance
+chi_squared <- chisq.test(tab)
+print(chi_squared)
+
+#Calcul du V de Cramer
+n_total <- sum(tab)
+k <- min(nrow(tab), ncol(tab)) 
+V_cramer <- sqrt(chi_squared$statistic / (n_total * (k - 1)))
+
+# Affichage de la valeur du V de Cramer
+cat("Valeur du V de Cramer :", round(V_cramer, 3), "\n")
+
+###################################################################################
+###############################Question-12#########################################
+##################################################################################
+#Création de la variable conducteur qui stocke tout les conducteurs ayant été tuées ou
+#hospitalisées
+conducteur <- subset(data_grav,
+                     catu == 1 & grav %in% c("Tué", "Blessé hospitalisé"))
+
+# Diagramme : nuage de dispersion et courbe de régression lissée
+with(conducteur,
+     loess(age ~ heure, span = 0.8)) -> smooth
+
+with(conducteur,
+     plot(age ~ heure,
+          pch = 21,
+          col = "black",
+          bg = "blue",
+          las = 1,
+          cex = 0.7,
+          main = "Nuage de dispersion : age versus heure",
+          xlab = "Variable heure",
+          ylab = "Variable age"))
+
+with(conducteur,
+     lines(fitted(smooth) ~ heure,
+           col = "red",
+           lwd = 3))
+
+smooth = data.frame(heure = conducteur$heure,
+                    smooth = fitted(smooth))
+smooth = smooth[order(smooth$heure,decreasing = FALSE),]
+
+#Mettre les 2 graphiques en matrices
+par(mfrow = c(1, 2)) 
+
+#Diagramme 
+with(conducteur,
+     plot(age ~ heure,
+          pch = 21,
+          col = "black",
+          bg = "blue",
+          las = 1,
+          cex = 0.7,
+          main = "Nuage de dispersion : Age versus Heure",
+          xlab = "Variable Heure",
+          ylab = "Variable Age"))
+
+with(smooth,
+     lines(smooth ~ heure,
+           col = "red",
+           lwd = 3))
+
+#Texte d'information
+mtext("BUT Science des données",
+      side = 1, adj = 0, line = 3.5, cex = 0.8, col = 'black')
+mtext("Source: data.gouv.fr",
+      side = 1, adj = 1, line = 3.5, cex = 0.8, col = 'black')
+
+#Mesure de la correlation
+Pearson = 100*with(conducteur,
+                   cor(heure,age, method = "pearson"))
+print(Pearson)
+
+############ Modélisation :régréssion linéaire simple ################
+
+model = lm(age ~ heure, data = conducteur)
+
+#Affichage du model
+print(model)
+
+summary(model)
+
+anova(model)
+
+#Visualisation de la droite des moindres carrés
+with(conducteur,
+     plot(age ~ heure,
+          pch = 21,
+          col = "black",
+          bg = "blue",
+          las = 1,
+          cex = 0.7,
+          main = "Régression lissée et droite des moindres carrées",
+          xlab = "Variable Heure",
+          ylab = "Variable Age"))
+
+with(smooth,
+     lines(smooth ~ heure,
+           col = "red",
+           lty = 2,
+           lwd = 3))
+
+abline(model,
+       col = "green4",
+       lty = 1,
+       lwd = 3)
+
+#Légende
+legend(x = "topleft",
+       lty = c(2,1),
+       lwd = c(3,3),
+       col = c("red", "green4"),
+       legend = c("Régrssion lissée", "Droite des moindres carrés"),
+       cex = 0.5,
+       bty = "n")
+
+#Texte d'information
+mtext("BUT Science des données",
+      side = 1, adj = 0, line = 3.5, cex = 0.8, col = 'black')
+mtext("Source: data.gouv.fr",
+      side = 1, adj = 1, line = 3.5, cex = 0.8, col = 'black')
+
+
+###################################################################################
+###############################Question-13#########################################
+##################################################################################
+# Mise à jour des modalités de la variable Sexe
+normandie$sexe = factor(normandie$sexe,
+                        levels = c(1, 2),
+                        labels = c("Homme", "Femme"))
+
+#Tableau de fréquence
+table4 <- round(100 * prop.table(table(normandie$grav, normandie$sexe), 1), 2)
+print(table4)
+
+#Graphique
+graph13 <- barplot(t(table4),  
+                   beside = TRUE,
+                   col = c("#4DB3FF", "#ECA7E3"),
+                   xlab = "Gravité des Blessures",
+                   ylab = "",
+                   ylim = c(0, max(table4) * 1.2),
+                   main = "Répartition des victimes selon la gravité par Sexe en Normandie",
+                   las = 1,
+                   axes = FALSE)
+
+axis(side = 2, at = seq(0, max(table4) * 1.2, by = 10), las = 1, line = 1)
+
+mtext("Pourcentage", side = 2, line = 3.1)
+
+#Etiquettes
+text(x = graph13, 
+     y = t(table4) + 2, 
+     labels = paste0(t(table4), "%"), 
+     cex = 0.8)
+
+#Légende 
+legend("topright",
+       col = c("#4DB3FF", "#ECA7E3"),
+       legend = c("Homme", "Femme"),
+       bty = "n",
+       pch = 15,
+       x.intersp = 0.7,
+       y.intersp = 0.9,
+       cex = 0.85,
+       inset = c(0.02, 0.05))
+
+#Texte d'information
+mtext("BUT Science des données",
+      side = 1, adj = 0, line = 3.5, cex = 0.8, col = 'black')
+mtext("Source: data.gouv.fr",
+      side = 1, adj = 1, line = 3.5, cex = 0.8, col = 'black')
+
+#Calcul du V de cramer
+v_cramer = round((cramersV(normandie$grav, normandie$sexe)*100), 2)
+print(v_cramer)
+
+###################################################################################
+###############################Question-14#########################################
+##################################################################################
+
+#Filtrer les conducteurs uniquement (catégorie 1)
+conducteur = subset(normandie,
+                    subset = catu == '1',
+                    select = c(age, grav))
+
+#Remplacer les codes par les libellés
+conducteur$grav <- factor(conducteur$grav,
+                           levels = c(1, 2, 3, 4),
+                           labels = c("Indemne", "Tué", "Blessé hospitalisé", "Blessé léger"))
+conducteur
+
+#Calcul des moyennes d'âge par type de gravité
+aggregate(x = conducteur$age,
+          by = list(Gravite = conducteur$grav),
+          FUN = mean,
+          na.rm = TRUE) -> mean.age
+
+#Affichage de la moyenne
+mean.age
+
+#Graphique
+with(data = conducteur,
+     expr = boxplot(age ~ grav,
+            col = c("lightblue", "red", "red4", "blue"),           
+            main = "Répartition de l'âge des conducteurs selon \n la gravité de l'accident",
+            xlab = "Gravité",
+            ylab = "Age des conducteurs"))
+
+#Affichage d'un boxplot de l'âge selon la gravité
+points(x = 1:4,
+       y = mean.age$x,
+       pch = 20,
+       cex = 1.5,
+       col = "black")
+
+#Relier les points des moyennes avec une ligne
+lines(x = 1:4,
+      y = mean.age$x,
+      col = "black",
+      lwd = 2,        
+      lty = 1)        
+
+#Texte d'information
+mtext("BUT 1 - Science des données",
+      side = 1, adj = 0, line = 3.5, cex = 0.8, col = 'black')
+mtext("Source: data.gouv.fr",
+      side = 1, adj = 1, line = 3.5, cex = 0.8, col = 'black')
+
+#Supprimer les lignes avec des valeurs manquantes
+conducteur <- na.omit(conducteur)
+
+#Recode de la gravité en numérique pour calcul du coefficient
+conducteur$grav_num <- as.numeric(conducteur$grav)
+
+#Calcul du coefficient de corrélation de Pearson
+cor_pearson <- cor(conducteur$age, conducteur$grav_num, method = "pearson")
+
+#Affichage du résultat
+cor_pearson
+
+###################################################################################
+###############################Question-15#########################################
+##################################################################################
+# Création de la variable Décés_nor_2023 qui stocke l'age des décés
+# survenu lors des accidents en Normandie en 2023
+Deces_nor_2023 <- subset(data_grav,
+                         subset = grav == "Tué" & Year == "2023",
+                         select = c(Num_Acc, Year, dep, age, grav))
+
+#Suppression des valeurs manquantes
+Deces_nor_2023 <- na.omit(Deces_nor_2023)
+
+#Graphique
+graph15 <- hist(Deces_nor_2023$age,
+                probability = TRUE,
+                col = "#E8FAFB",
+                ylim = c(0, 0.035),  # légèrement plus haut pour laisser de la place
+                main = "Répartition des accidentés tués selon l'âge en Normandie en 2023",
+                xlab = "Âge des tués",
+                ylab = "Densité")
+
+#Ajout des densités sur chaque barre
+text(x = graph15$mids,
+     y = graph15$density+0.001,
+     labels = graph15$counts,
+     cex = 0.8)
+
+#Moyenne
+abline(v = mean(Deces_nor_2023$age),
+       lty = 2,
+       col = "blue2",
+       lwd = 2)
+
+#Quartiles
+quartiles <- quantile(Deces_nor_2023$age, probs = c(0.25, 0.5, 0.75))
+abline(v = quartiles,
+       lty = 3,
+       col = "red2",
+       lwd = 2)
+
+#Labels des quartiles )
+text(x = quartiles,
+     y = rep(0.028, 3),   
+     labels = c("Q1", "Me", "Q3"),
+     col = "black",
+     font = 1)
+
+#Texte d'information
+mtext("BUT Science des données",
+      side = 1, adj = 0, line = 3.5, cex = 0.8, col = 'black')
+mtext("Source: data.gouv.fr",
+      side = 1, adj = 1, line = 3.5, cex = 0.8, col = 'black')
+
+</code></pre>             
+</body>
+</html>

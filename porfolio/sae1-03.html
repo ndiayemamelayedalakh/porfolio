@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Projet Écriture et Lecture de Fichiers</title>
+  <link rel="stylesheet" href="style2.css">
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-okaidia.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+
+</head>
+<body>
+  <header>
+    <h1>Écriture et lecture d'un fichier de <br>données avec Python</h1>
+  </header>
+
+  <section>
+    <h2>Présentation du projet</h2>
+<p>
+  Ce projet consiste à analyser les données sur <strong>les lauréats des Prix Nobel</strong> à l’aide du langage Python. 
+  À partir du fichier <code>prix_nobel_donnees.csv</code>, nous identifierons les lauréats, leurs contributions et les contextes d’attribution 
+  afin de dégager des <strong>tendances et statistiques pertinentes</strong>. Le projet comprendra l’utilisation du bibliothèques Python 
+  <em>Openpyxl</em>  pour le <strong>nettoyage, la manipulation et l’analyse des données</strong>, dans le but d’améliorer la qualité du jeu de données 
+  et d’en tirer des insights.
+</p>
+
+
+    <h2>Organisation et démarche</h2>
+<p>
+  Le projet a été réalisé <strong>en groupe de quatre</strong>, avec un <strong>suivi quotidien</strong> et l’appui de diverses ressources 
+  (cours de Python, SAÉ et recherches en ligne). L’analyse a été menée à l’aide de <strong>Python</strong>, et les résultats ont été présentés 
+  dans un <em>rapport Word</em>.
+</p>
+
+<p>
+  La démarche a commencé par un <strong>nettoyage rigoureux des données</strong>, consistant à <strong>uniformiser les valeurs manquantes</strong> 
+  plutôt qu’à supprimer des enregistrements. Des mentions comme <code>N/A</code> ou <code>Inconnue</code> ont été utilisées selon le type d’information absente. 
+  Une fois le jeu de données fiabilisé, plusieurs <strong>fonctions Python</strong> ont permis de produire des <strong>statistiques clés</strong> : 
+  répartition hommes-femmes, âge minimal et maximal des lauréats, classement des pays et organisations les plus récompensés. 
+  Ces analyses mettent en évidence la <strong>diversité</strong>, la <strong>répartition géographique</strong> et les 
+  <strong>tendances démographiques</strong> des Prix Nobel.
+</p>
+Cet extrait de code illustre concrètement le nettoyage.
+   <pre><code class="language-python">
+    def ajouter_col_age_au_prix(donnees):
+    """
+    Ajoute une colonne "age_au_prix" au jeu de données, indiquant l'âge du lauréat
+    au moment de l'obtention du prix Nobel. Si la date de naissance est inconnue, 
+    la valeur de "age_au_prix" est fixée à None.
+
+    Args:
+        donnees (list): Liste de dictionnaires
+
+    Returns:
+        None: La fonction modifie directement la liste de dictionnaires en ajoutant
+              une nouvelle clé "age_au_prix" pour chaque lauréat.
+    """
+    for laureat in donnees:
+        # Vérifie si la date de naissance est renseignée
+        if laureat["birth_date"] != "Inconnue":
+            age = laureat["year"] - laureat["birth_date"].year
+            laureat['age_au_prix'] = age
+        else:
+            # Si la date de naissance est inconnue, on met 'age_au_prix' à None
+            laureat['age_au_prix'] = None
+   </code> </pre>
+
+
+ <h2>Acquis</h2>
+<p>
+Ce projet m’a permis de développer plusieurs compétences clés en <strong>Python</strong> et en analyse de données. 
+<br>J’ai appris à manier des <strong>structures de données complexes</strong> comme les listes imbriquées et les dictionnaires,
+ à enchaîner nettoyage, enrichissement et calcul pour produire des statistiques fiables, et à convertir correctement les chaînes 
+ en valeurs numériques. 
+</p>
+
+<ul class="acquis-list">
+  <li>Maîtrise de l'<strong>exploration et manipulation de données</strong> avec Python.</li>
+  <li>Capacité à <strong>nettoyer, enrichir et analyser</strong> des jeux de données variés.</li>
+  <li>Compétence dans <strong>l’exportation de données</strong> en CSV, JSON et Excel via <code>Openpyxl</code>.</li>
+  <li>Renforcement du <strong>travail collaboratif</strong> et de l’échange de bonnes pratiques.</li>
+</ul>
+
+   <!-- Boutons de téléchargement -->
+<a href="Scripts/script_lecture.html" class="download-btn script" target="_blank">Voir le script</a>
+  </section>
+
+  <footer>
+    <p><a href="index.html">Retour à l’accueil</a></p>
+  </footer>
+</body>
+</html>

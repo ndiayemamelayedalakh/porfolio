@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Script Python Nettoyage </title>
+  <link rel="stylesheet" href="style2.css">
+ <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-okaidia.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+</head>
+<body>
+    <pre>
+        <code class="language-python">
+###### MODULE de gestion de bdd: créer/fermer connexion,
+###### Créer la bdd et tables, insérer les données, explorer les données
+#########################################################################
+
+import pandas as pd
+import numpy as np
+import mysql.connector as mysqlcon
+from gestion_nettoyage import nettoyer_preparer_donnees as nett
+
+def creer_connexion(nom_host, nom_user, mdp_user, nom_bdd = ''):
+    """
+    Crée une connexion au serveur MySQL.
+
+    Args:
+        nom_host (str): Le nom de l'hôte où le serveur MySQL est situé.
+        nom_user (str): Le nom de l'utilisateur pour se connecter au serveur.
+        mdp_user (str): Le mot de passe de l'utilisateur pour se connecter au serveur.
+        nom_bdd (str): Le nom de la base de données à utiliser (optionnel).
+
+    Returns:
+        MySQLConnection: Une instance de connexion au serveur MySQL.
+    Raises:
+        mysql.connector.Error: Une erreur survient de la part de MySQL pour
+                              des raisons qui peuvent inclure des problèmes
+                              de connexion réseau ou des pbs liés à la BDD.
+
+    """
+    connexion = None
+    try:
+        # à completerè
+        connexion = mysqlcon.connect(
+            host=nom_host,
+            user=nom_user,
+            password=mdp_user,
+            database=nom_bdd
+        )
+        
+    except mysqlcon.Error as err:
+        print(f"Erreur de connexion : {err}")
+    return connexion
+
+def fermer_connexion(connexion):
+    """
+    Ferme une connexion MySQL si elle est active.
+
+    Args :
+    connexion (mysql.connector.connection.MySQLConnection or None): Connexion
+    active à une base de données MySQL. Si elle est déjà fermée ou None,
+    la fonction ne fait rien.
+
+    """
+    pass
+
+def selectionner_bdd(connexion, nom_bdd):
+    """
+    Sélectionne la base de données spécifiée pour la connexion donnée.
+
+    Args:
+        connexion (MySQLConnection or None): Connexion
+        nom_bdd (str): Nom de la base de données à sélectionner.
+    """
+    curseur = None
+
+    try:
+        curseur = connexion.cursor()
+        curseur.execute(f"USE {nom_bdd};")
+        print('Sélection réussie')
+    except mysqlcon.Error as err:
+        print(f"Erreur de connexion : {err}")
+        
+def creer_bdd(connexion, nom_bdd):
+    """
+    Crée une nouvelle base de données MySQL si elle n'existe pas déjà
+    et la sélectionne pour être utilisée.
+
+    Args:
+        connexion (MySQLConnection): La connexion au serveur MySQL où la BDD sera créée.
+        nom_bdd (str): Le nom de la BDD à créer et sélectionner.
+
+    Raises:
+        mysql.connector.Error: Une erreur survient liée à MySQL pour des raisons
+        qui peuvent inclure des problèmes de permissions, erreurs de syntaxe
+        dans le nom de BDD, ou problèmes de connexion réseau.
+    """
+    curseur = None
+    try:
+        if connexion:
+            curseur = connexion.cursor()
+            curseur.execute(f"CREATE DATABASE IF NOT EXISTS {nom_bdd};")
+            selectionner_bdd(connexion, nom_bdd)
+        else:
+            raise mysqlcon.Error("Connexion MySQL non fournie.")
+    except mysqlcon.Error as err:
+        raise mysqlcon.Error(
+            f"Une erreur MySQL est survenue : {err}\n"
+            "Cela peut être dû à un problème de permissions, "
+            "une erreur de syntaxe dans le nom de la BDD ou un problème de connexion réseau."
+        )
+
+def tables_deja_creees(connexion, liste_tables):
+    """
+    FONCTION COMPLETE
+    Vérifie si toutes les tables sont déjà présentes dans la base de données.
+    Vous pouvez l'utiliser pour éviter de recréer les tables si elles sont déjà
+    créées.
+
+    Args:
+        connexion (MySQLConnection): Connexion active à un serveur MySQL.
+        liste_tables (list[str]): Liste des noms de tables attendues.
+
+    Returns:
+        bool: True si toutes les tables sont présentes, False sinon.
+        En cas d’erreur, un message est affiché mais l'exception n’est pas propagée.
+    """
+    curseur = None
+    try:
+        curseur = connexion.cursor()
+        curseur.execute("SHOW TABLES")
+        tables_existantes = {ligne[0] for ligne in curseur.fetchall()}
+        return all(table in tables_existantes for table in liste_tables)
+    except Exception as e:
+        print(f"Erreur lors de la vérification des tables : {e}")
+        return False
+    finally:
+        if curseur:
+            curseur.close()
+
+def bdd_existe(connexion, nom_bdd):
+    """
+    FONCTION COMPLETE
+    Vérifie si une base de données existe sur le serveur MySQL.
+    Utile lors de la création de la base de données : cela permet d’éviter
+    de la recréer si elle existe déjà, grâce à la vérification effectuée par
+    bdd_existe.
+
+    Args :
+    connexion (MySQLConnection): Connexion active à un serveur MySQL.
+    nom_bdd (str): Nom de la base de données dont on veut vérifier l'existence.
+
+    Renvoie :
+    bool: True si la base de données existe, False sinon ou en cas d'erreur.
+    En cas d’erreur, un message est affiché mais l'exception n’est pas propagée.
+    """
+
+    curseur = None
+    try:
+        curseur = connexion.cursor()
+        curseur.execute("SHOW DATABASES LIKE %s", (nom_bdd,))
+        for database in curseur:
+            if database:
+                return True
+        return False
+    except mysqlcon.Error as e:
+        print(f"Erreur lors de la vérification de l'existence de la base de données : {e}")
+        return False
+    finally:
+        if curseur:
+            curseur.close()
+
+def creer_tables(connexion):
+    """
+    Crée les tables nécessaires pour la base de données si elles n'existent
+    pas déjà.
+
+    Args:
+        connexion (MySQLConnection): La connexion au serveur MySQL utilisée
+        pour exécuter les requêtes.
+    Raises:
+        En cas d’erreur, un message est affiché mais l'exception n’est pas propagée.
+    """
+    curseur = None
+    
+    
+    req4 = """create TABLE IF NOT EXISTS patient (
+             id_pat int primary key auto_increment,
+             nom_pat varchar(30),
+             prenom_pat varchar(30),
+             age INT,
+             sexe enum('Male','Female'),
+             Group_sanguin enum('A-','A+','AB+','B+','B-','O+','O-' ),
+             id_ass INT,
+             foreign key (id_ass) references assurance (id_ass)
+             on delete cascade on update cascade
+             );
+            """
+            
+    req2 = """create table if not exists medecin (
+             id_med int primary key auto_increment,
+             nom_med varchar(30),
+             prenom_med varchar(30)
+             );
+            """
+            
+    req3 = """create table if not exists hopital (
+             id_hop int primary key auto_increment,
+             nom_hop varchar(30) not null UNIQUE
+             );
+            """
+            
+    req1 = """ create table if not exists assurance(
+             id_ass int primary key auto_increment,
+             nom_ass varchar(30) UNIQUE
+             );
+            """
+            
+    req5 = """create table if not exists medicament(
+             id_medic int primary key auto_increment,
+             nom_medic varchar(30)
+             );
+            """      
+       
+    req6 = """create table if not exists admission (
+             id_add int primary key auto_increment,
+             id_pat int,
+             id_hop int,
+             num_chambre int,
+             etat_sante varchar(30) ,
+             date_admission datetime,
+             date_sortie datetime,
+             mont_facture float,
+             typ_add varchar(30),
+             test_res varchar(30),
+             foreign key (id_pat) references patient (id_pat)
+             on delete cascade on update cascade,
+             foreign key (id_hop) references hopital (id_hop)
+             on delete cascade on update cascade
+             );
+            """
+    
+    req7 = """create table if not exists travail (
+            id_med int,
+            id_hop int,
+            primary key (id_med, id_hop), 
+            foreign key (id_med) references medecin (id_med)
+            on delete cascade on update cascade,
+            foreign key (id_hop) references hopital (id_hop)
+            on delete cascade on update cascade
+            );
+            """
+            
+    req8 = """create table if not exists consultation (
+            id_cons int primary key auto_increment,
+            id_pat int,
+            id_med int,
+            id_medic int,
+            foreign key (id_pat) references patient (id_pat)
+            on delete cascade on update cascade,
+            foreign key (id_med) references medecin (id_med)
+            on delete cascade on update cascade,
+            foreign key (id_medic) references medicament (id_medic)
+            on delete cascade on update cascade
+            );
+            """
+    try:
+         curseur = connexion.cursor()
+         #à completer pour exécuter les requetes de création de tables
+         for req in [req1,req2,req3,req4,req5,req6,req7,req8]:
+             curseur.execute(req)
+         
+    except mysqlcon.Error as err:
+        raise mysqlcon.Error(f"Erreur lors de la création de la table {err}")
+    finally:
+        if curseur:
+            curseur.close()    
+            
+            
+            
+def recuperer_id_existant (connexion, nom_table, noms_cols, valeurs) :
+    """
+    Selectionne les ID des nouvaux données enregistrées dans une table de donnée.
+
+    Args:
+        connexion (MySQLConnection): Connexion active à un serveur MySQL.
+        nom_table (str): Nom de la table où on insère
+        noms_cols (list[str]): Noms des colonnes concernées.
+        valeurs (tuple): Valeurs à insérer.
+
+    Returns:
+        int ou None: ID de l’enregistrement inséré, ou None en cas d’échec ou doublon.
+        En cas d’erreur, un message est affiché mais l'exception n’est pas propagée.
+
+    """
+    
+    curseur = None
+    try :
+        # Création du curseur
+        curseur = connexion.cursor()
+        
+        condition = " AND ".join([f"{col} = %s" for col in noms_cols])
+        requete = f"SELECT * FROM {nom_table} WHERE {condition}"
+
+        curseur.execute(requete, valeurs)
+        
+        result = curseur.fetchone()
+
+        return result[0] if result else None
+
+        
+    except mysqlcon.Error as e:
+        print(f"Erreur de sélection des ID: {e}")
+        return None
+    finally:
+        if curseur:
+            curseur.close()    
+    
+    
+
+def inserer_nouveau_enreg(connexion, nom_table, noms_cols, valeurs):
+    """
+    Insère un nouvel enregistrement dans une table donnée en ignorant les doublons.
+
+    Args:
+        connexion (MySQLConnection): Connexion active à un serveur MySQL.
+        nom_table (str): Nom de la table où on insère
+        noms_cols (list[str]): Noms des colonnes concernées.
+        valeurs (tuple): Valeurs à insérer.
+
+    Returns:
+        int ou None: ID de l’enregistrement inséré, ou None en cas d’échec ou doublon.
+        En cas d’erreur, un message est affiché mais l'exception n’est pas propagée.
+
+    """
+
+    curseur = None
+    try :
+        # Création du curseur
+        curseur = connexion.cursor()
+        
+        # Création de '%s' en fonction du nombre d'élément de noms_cols
+        colonnes = ", ".join(noms_cols)
+        inconnue = ", ".join(["%s"] * len(noms_cols))
+        
+        # écriture de la requête
+        
+        requete = f"""
+            INSERT IGNORE INTO {nom_table} ({colonnes})
+            VALUES ({inconnue})
+        """
+        
+        # Execution de la réquête
+        
+        if isinstance(valeurs, tuple):
+            curseur.execute(requete, valeurs)
+        else:
+            curseur.executemany(requete, valeurs)
+
+        connexion.commit()
+        
+        return curseur.lastrowid if curseur.lastrowid else None
+        
+    except mysqlcon.Error as e:
+        print(f"Erreur lors de l'insertion des données : {e}")
+        return None
+    finally:
+        if curseur:
+            curseur.close()
+            
+
+
+# Si besoin ajouter autres fonctions pour vous aider lors de l'insertion
+
+#########################################################
+####### Fonctions d'exploration de la bdd à compléter
+#########################################################
+def get_nbre_patients_par(connexion, condition):
+
+    curseur = None
+    try:
+        curseur = connexion.cursor(dictionary=True)
+        requete = f"""
+            SELECT {condition} AS critere, COUNT(*) AS total
+            FROM patient
+            GROUP BY {condition}
+        """
+        curseur.execute(requete)
+        return curseur.fetchall()
+    except Exception as e:
+        print(f"Erreur dans la fonction get_nbre_patients_par : {e}")
+        return None
+    finally:
+        if curseur:
+            curseur.close()
+
+def get_top10_medecins_les_plus_consultes(connexion):
+    """
+    Récupère les 10 médecins ayant le plus grand nombre de consultations enregistrées.
+
+    Args:
+        connexion (MySQLConnection): Connexion active à un serveur MySQL.
+
+    Returns:
+        list[dict] | None: Liste de dictionnaires avec nom complet du médecin et nb de consultations.
+        En cas d’erreur, un message est affiché mais l'exception n’est pas propagée.
+
+    """
+    curseur = None
+    try:
+        curseur = connexion.cursor(dictionary=True)
+        requete = """
+            SELECT 
+                CONCAT(m.nom_med, ' ', m.prenom_med) AS nom_complet,
+                COUNT(*) AS nb_consultations
+            FROM consultation c
+            JOIN medecin m ON c.id_med = m.id_med
+            GROUP BY c.id_med
+            ORDER BY nb_consultations DESC
+            LIMIT 10
+        """
+        curseur.execute(requete)
+        return curseur.fetchall()
+    except Exception as e:
+        print(f"Erreur dans get_top10_medecins_les_plus_consultes : {e}")
+        return None
+    finally:
+        if curseur:
+            curseur.close()
+
+def get_top5_hopitaux_a_plus_gros_budget(connexion):
+    """
+    Récupère les 5 hôpitaux ayant généré les plus gros budgets totaux via les rapports d’hospitalisation.
+
+    Args:
+        connexion (MySQLConnection): Connexion active à un serveur MySQL.
+
+    Returns:
+        list[dict] | None: Liste des hôpitaux avec leur budget total.
+        En cas d’erreur, un message est affiché mais l'exception n’est pas propagée.
+
+    """
+    curseur = None
+    try:
+        curseur = connexion.cursor(dictionary=True)
+        requete = """
+            SELECT 
+                h.nom_hop,
+                SUM(a.mont_facture) AS budget_total
+            FROM admission a
+            JOIN hopital h ON a.id_hop = h.id_hop
+            GROUP BY h.nom_hop
+            ORDER BY budget_total DESC
+            LIMIT 5
+        """
+        curseur.execute(requete)
+        return curseur.fetchall()
+    except Exception as e:
+        print(f"Erreur dans get_top5_hopitaux_a_plus_gros_budget : {e}")
+        return None
+    finally:
+        if curseur:
+            curseur.close()
+
+
+        </code>
+    </pre>
+</body>

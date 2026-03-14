@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Script Python lecture </title>
+  <link rel="stylesheet" href="style2.css">
+ <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-okaidia.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+</head>
+<body>
+    <pre>
+        <code class="language-python">
+import csv
+import os
+import json
+import openpyxl
+from datetime import datetime
+##################################################################
+###### Auteurs: Mathis Migout, Fatou Alle Diop, Mame Laye Ndiaye, Abdou Khadre Dabo
+##################################################################
+
+###################  ATTENTION ###################################
+# NE CHANGEZ PAS LES CODES DONNÉS de certaines fonctions
+# RESPECTEZ LES SIGNATURES des fonctions
+
+#################################################################
+############## Lecture d'un fichier CSV  ###########
+#################################################################
+def lecture_fichier(nom_fichier):
+    # À COMPLETER avec sa docstring
+    """
+   Lit un fichier CSV et retourne son contenu sous forme de liste de dictionnaires.
+
+   Chaque ligne du fichier CSV est convertie en un dictionnaire, où les clés sont les noms des colonnes 
+   et les valeurs sont les données de chaque ligne.
+
+   Args:
+       nom_fichier (str): Le nom ou le chemin du fichier CSV à lire.
+
+   Returns:
+       list: Une liste de dictionnaires, où chaque dictionnaire représente une ligne du fichier, 
+             avec les clés correspondant aux en-têtes du fichier CSV.
+    """
+    laureats = []
+    
+    with open(nom_fichier, mode='r',encoding='utf-8') as file:
+        lecteur_csv = csv.DictReader(file)
+        
+        for ligne in lecteur_csv:
+            laureats.append(ligne)
+            
+    return laureats
+
+#################################################################
+############## Fonctions de Nettoyage du jeu de données  ########
+#################################################################
+#CODE FONCTION COMPLET À NE PAS MODIFIER
+def recuperer_colonne (donnees, nom_colonne):
+    """
+    Récupère toutes les valeurs d'une colonne spécifiée à partir d'un jeu de données.
+
+    Args:
+        donnees (list): Une liste de dictionnaires
+        nom_colonne (str): dont on souhaite extraire les valeurs.
+
+    Returns:
+        list: Une liste contenant les valeurs de la colonne spécifiée pour chaque
+        enregistrement du jeu de données.
+    """
+    colonne = []
+    for el in donnees:
+        colonne.append(el[nom_colonne])
+    return colonne
+    #ou avec une liste de compréhension return [el.get(nom_colonne) for el in donnees]
+
+def compter_nbre_val_manquantes(colonne):
+    # CODE À COMPLETER avec la DOCSTRING
+    """
+   Compte le nombre de valeurs manquantes dans une colonne donnée.
+
+   Une valeur manquante est définie comme étant une valeur `None` ou une chaîne vide `""`.
+
+   Args:
+       colonne (list): Liste des valeurs dans la colonne. Chaque élément de la liste peut être de n'importe quel type, 
+                       mais seuls `None` et `""` sont considérés comme manquants.
+
+   Returns:
+       int: Le nombre total de valeurs manquantes dans la colonne.
+    """
+    return colonne.count(None) + colonne.count('') + colonne.count("NA")
+
+def total_val_manquantes_par_col (donnees):
+
+    """
+    Calcule le nombre de valeurs manquantes pour chaque colonne dans un jeu de données.
+    Elle renvoie un dictionnaire où les clés sont les noms des colonnes et les valeurs 
+    sont le total de valeurs manquantes dans chaque colonne.
+
+    Args:
+        donnees (list): Liste de dictionnaires 
+
+    Returns:
+        dict: Un dictionnaire où chaque clé est un nom de colonne et chaque valeur 
+        est le total de valeurs manquantes dans cette colonne.
+    """
+    # CODE À COMPLETER
+    valeurs_manquantes = {}
+    
+    for laureat in donnees:
+        for cle, valeur in laureat.items():
+            if valeur is None or valeur == '' or valeur == "N/A":
+                if cle not in valeurs_manquantes:
+                    valeurs_manquantes[cle]=0
+                valeurs_manquantes[cle]+=1
+        
+    return valeurs_manquantes
+
+def remplacer_val_manquantes(donnees, nom_colonne):
+    """
+    Remplace les valeurs manquantes dans une colonne spécifiée par des valeurs par 
+    défaut selon le type de données.
+
+    Args:
+        donnees (list): Une liste de dictionnaires 
+        nom_colonne (str): dans laquelle on remplace les valeurs manquantes.
+
+    Returns:
+        None
+    """
+    # Définir la valeur d'imputation en fonction du nom de la colonne
+    if nom_colonne in ["motivation", "birth_date", "birth_country_current",
+                      "ISO", "birth_country"]:
+        nv_val = "Inconnue"
+    elif nom_colonne in ["organization_name", "organization_city", "organization_country"
+                         , "sex"]:
+        nv_val = "N/A" # Non applicable pour les organisations et le sexe
+    else:
+        # Par défaut, on utilise None pour les colonnes où une valeur
+        #spécifique n'est pas définie
+        nv_val = None
+        
+    # CODE À COMPLETER
+    for laureat in donnees:
+        if laureat.get(nom_colonne) in ["N/A","NA",None, '']:
+            laureat[nom_colonne] = nv_val
+    
+
+
+#CODE FONCTION COMPLET À NE PAS MODIFIER
+def convertir_col_en_numerique(donnees, nom_colonne):
+    """
+    Convertit une colonne de données en type numérique si applicable.
+
+    Args:
+        donnees (list): Une liste de dictionnaires
+        nom_colonne (str): à convertir en type numérique.
+
+    Returns:
+        None
+    """
+    if nom_colonne == "birth_date":
+        for record in donnees:
+            if record[nom_colonne] != "Inconnue":
+                # Convertir la chaîne en objet date
+                record[nom_colonne] = datetime.strptime(record[nom_colonne], '%Y-%m-%d').date()
+
+    elif nom_colonne == "year":
+        #Pas de valeur manquantes donc on convertit sans passer par des tests
+        for record in donnees:
+            record[nom_colonne] = int(record[nom_colonne])
+
+def creer_jeu_donnees_valide(donnees):
+    """
+    Modifie le jeu de données en un jeu valide en remplaçant les valeurs manquantes par des valeurs
+    par défaut et en convertissant les colonnes numériques en types numériques.
+
+    Args:
+        donnees (list): Une liste de dictionnaires
+
+    Returns:
+        None: La fonction modifie directement la liste de dictionnaires en la rendant
+        valide
+    """
+    # CODE À COMPLETER
+    for i in donnees[0].keys():
+        remplacer_val_manquantes(donnees,i)
+        convertir_col_en_numerique(donnees,i)
+            
+
+#################################################################
+############## Fonctions pour ajouter des colonnes  ########
+#################################################################
+#CODE FONCTION COMPLET À NE PAS MODIFIER
+def ajouter_col_age_au_prix(donnees):
+    """
+    Ajoute une colonne "age_au_prix" au jeu de données, indiquant l'âge du lauréat
+    au moment de l'obtention du prix Nobel. Si la date de naissance est inconnue, 
+    la valeur de "age_au_prix" est fixée à None.
+
+    Args:
+        donnees (list): Liste de dictionnaires
+
+    Returns:
+        None: La fonction modifie directement la liste de dictionnaires en ajoutant
+              une nouvelle clé "age_au_prix" pour chaque lauréat.
+    """
+    for laureat in donnees:
+        # Vérifie si la date de naissance est renseignée
+        if laureat["birth_date"] != "Inconnue":
+            age = laureat["year"] - laureat["birth_date"].year
+            laureat['age_au_prix'] = age
+        else:
+            # Si la date de naissance est inconnue, on met 'age_au_prix' à None
+            laureat['age_au_prix'] = None
+
+def ajouter_col_pct_part_prix(donnees):
+    #CODE À COMPLÉTER AVEC DOCSTRING
+    """
+    Ajoute une colonne "pct_part_prix" au jeu de données, indiquant le pourcentage
+    de la part du prix Nobel attribué à chaque lauréat par rapport au montant total 
+    des prix Nobel attribués.
+
+    Args:
+        donnees (list): Liste de dictionnaires contenant les informations des lauréats.
+
+    Returns:
+        None: La fonction modifie directement la liste de dictionnaires en ajoutant
+              une nouvelle clé "pct_part_prix" pour chaque lauréat.
+    """
+    montant_total_prix = sum([laureat["prize_amount"] for laureat in donnees if laureat.get("prize_amount") is not None])
+
+    if montant_total_prix > 0:
+        for laureat in donnees:
+            if laureat.get("prize_amount") is not None:
+                laureat["pct_part_prix"] = (laureat["prize_amount"] / montant_total_prix) * 100
+            else:
+                laureat["pct_part_prix"] = None 
+    else:
+        for laureat in donnees:
+            laureat["pct_part_prix"] = None
+
+
+
+#################################################################
+############## Fonctions de calcul de statistiques  ########
+#################################################################
+
+def pourcentage_hommes_vs_femmes(donnees):
+    """
+    Calcule le pourcentage de lauréats masculins et féminins.
+
+    Args:
+        donnees (list): Liste de dictionnaires
+
+    Returns:
+        dict: Dictionnaire avec les pourcentages pour les clés 'Homme' et 'Femme'.
+    """
+    #CODE À COMPLÉTER
+    hommes = 0
+    femmes = 0
+
+    for laureat in donnees:
+        sexe = laureat.get("sex")
+        if sexe == "Male":
+            hommes += 1
+        elif sexe == "Female":
+            femmes += 1
+
+    total = hommes + femmes
+    if total == 0:  
+        return {'Homme': 0, 'Femme': 0}
+    
+    # Calcul des pourcentages
+    pourcentage_hommes = (hommes / total) * 100
+    pourcentage_femmes = (femmes / total) * 100
+
+    return {'Homme': round(pourcentage_hommes,2), 'Femme': round(pourcentage_femmes,2)}
+
+def plus_jeune_plus_vieux(donnees):
+    """
+    Trouve les lauréats du prix Nobel les plus jeunes et les plus âgés au moment de
+    la réception de leur prix
+    Args:
+        donnees (list): Liste de dictionnaires
+
+    Returns:
+        dict: Un dictionnaire contenant les informations du plus jeune
+        et du plus vieux lauréat. Le dictionnaire a la structure suivante :
+              {
+                  "plus_jeune": {"nom": str, "age": int, "pays": str, "prix": str},
+                  "plus_vieux": {"nom": str, "age": int, "pays": str, "prix": str}
+              }
+    """
+    # Filtrer les lauréats avec un âge défini
+    laureats_avec_age = [laureat for laureat in donnees if laureat["age_au_prix"] is not None]
+
+    #CODE À COMPLÉTER
+    plus_jeune = None
+    plus_vieux = None
+
+    for laureat in donnees:
+        age = laureat.get("age_au_prix")
+        if age is not None:
+            if plus_jeune is None or age < plus_jeune["age"]:
+                plus_jeune = {
+                    "nom": laureat["full_name"],
+                    "age": age,
+                    "pays": laureat["birth_country_current"],
+                    "prix": laureat["category"]
+                }
+            if plus_vieux is None or age > plus_vieux["age"]:
+                plus_vieux = {
+                    "nom": laureat["full_name"],
+                    "age": age,
+                    "pays": laureat["birth_country_current"],
+                    "prix": laureat["category"]
+                }
+
+    return {
+        "plus_jeune": plus_jeune,
+        "plus_vieux": plus_vieux
+    }
+
+    # Préparer les résultats à compléter
+    resultat = {
+            "plus_jeune": {
+                "nom": "",
+                "age": float('inf'), 
+                "pays": "",
+                "prix": ""
+            },
+            "plus_vieux": {
+                "nom": "",
+                "age": -1, 
+                "pays": "",
+                "prix": ""
+            }
+        }
+
+def nombre_prix_par_critere(donnees, critere):
+    """
+    Compte le nombre de prix Nobel en fonction du critère spécifié,
+    en excluant les valeurs None, "NA" et "Inconnue".
+
+    Args:
+        donnees (list): Liste de dictionnaires 
+        critere (str): le nom de la colonne utilisé pour le regroupement de valeurs.
+
+    Returns:
+        dict: Un dictionnaire avec les comptes basés sur le critère spécifié,
+        en excluant les valeurs non pertinentes.
+    """
+    dico_nbre_items = {}
+    valeurs_a_exclure = ["NA", "Inconnue", None]  # Liste des valeurs à ignorer
+
+    # Compter les prix par critere
+    col_de_critere = recuperer_colonne(donnees, critere)
+    for item in col_de_critere:
+        # Vérifie si l'élément n'est pas dans les valeurs à exclure
+        if item not in valeurs_a_exclure:
+            if item not in dico_nbre_items:
+                dico_nbre_items[item] = 0
+            dico_nbre_items[item] += 1
+    return dico_nbre_items
+
+def top20_pays_avec_plus_de_prix(donnees):
+    """
+    Affiche les 20 pays ayant remporté le plus de prix Nobel.
+
+    Args:
+        donnees (list): Liste de dictionnaires 
+
+    Returns:
+        list: Liste de listes [pays, nombre de prix] triée par ordre décroissant 
+        du nombre de prix.
+    """
+    #CODE À COMPLÉTER AVEC DOCSTRING
+    compteur_pays = {}
+    
+    for laureat in donnees:
+        pays = laureat.get('birth_country_current')
+        if pays:
+            if pays in compteur_pays:
+                compteur_pays[pays] += 1
+            else:
+                compteur_pays[pays] = 1
+    
+    pays_triees = list(compteur_pays.items())
+    
+    for i in range(len(pays_triees)):
+        for j in range(i + 1, len(pays_triees)):
+            if pays_triees[i][1] < pays_triees[j][1]:
+                pays_triees[i], pays_triees[j] = pays_triees[j], pays_triees[i]
+    
+    top_n_pays = dict(pays_triees[:20])
+    
+    return top_n_pays
+
+def top_n_organisations_avec_plus_de_prix(donnees, n=5):
+    """
+    Affiche les 'n' organisations ayant remporté le plus de prix Nobel.
+    Args:
+        donnees (list): Liste de dictionnaires 
+        n (int): Nombre d'organisations à afficher dans le top. Par défaut, 5.
+
+    Returns:
+        list: Liste de listes [organisation, nombre de prix] triée par ordre 
+        décroissant du nombre de prix.
+    """
+    #CODE À COMPLÉTER
+    compteur_organisations = {}
+    
+    for laureat in donnees:
+        organisation = laureat.get('organization_name')
+        if organisation and organisation != "N/A" and organisation != "Inconnue":
+            if organisation in compteur_organisations:
+                compteur_organisations[organisation] += 1
+            else:
+                compteur_organisations[organisation] = 1
+    
+    organisations_triees = list(compteur_organisations.items())
+    for i in range(len(organisations_triees)):
+        for j in range(i + 1, len(organisations_triees)):
+            if organisations_triees[i][1] < organisations_triees[j][1]:
+                organisations_triees[i], organisations_triees[j] = organisations_triees[j], organisations_triees[i]
+    
+    top_n_organisations = dict(organisations_triees[:n])
+    
+    return top_n_organisations
+
+def ville_avec_plus_de_prix(donnees):
+    """
+    Trouve la ville ayant le plus de prix Nobel.
+
+    Args:
+        donnees (list): Liste de dictionnaires 
+    Returns:
+        tuple: Liste contenant la ville et le nombre de prix [ville, nombre de prix].
+    """
+    #CODE À COMPLÉTER
+    ville_count = {}
+
+    for laureat in donnees:
+        ville = laureat.get("organization_city") 
+        if ville and ville != "N/A" and ville != "Inconnue":  
+            ville_count[ville] = ville_count.get(ville, 0) + 1
+
+    # Trouver la ville avec le plus de prix Nobel
+    if ville_count:
+        ville_max = max(ville_count, key=ville_count.get)  
+        return [ville_max, ville_count[ville_max]]
+    return None
+
+def laureats_plusieurs_prix(donnees):
+    """
+    Renvoie les lauréats ayant reçu le prix Nobel plusieurs fois 
+
+    Args:
+        donnees (list): Liste de dictionnaires 
+    Returns:
+        dict: Un dictionnaire où les clés sont les noms des lauréats ayant reçu 
+        plusieurs prix et les valeurs sont le nombre de prix remportés.
+    """
+    #CODE À COMPLÉTER
+    laureat_count = {}
+
+    for laureat in donnees:
+        nom = laureat.get("full_name")
+        if nom and nom != "NA" and nom != "Inconnue":  
+            laureat_count[nom] = laureat_count.get(nom, 0) + 1
+
+    laureats_multiple = {nom: count for nom, count in laureat_count.items() if count > 1}
+
+    return laureats_multiple
+
+
+#################################################################
+############## Écriture dans des fichiers CSV, Excel et JSON
+#################################################################
+def generer_dico_stats(donnees):
+    """
+    Génère un dictionnaire de statistiques à partir du jeu de données valide 
+
+    Args:
+        donnees (list): Une liste de dictionnaires 
+    Returns:
+        dict: Un dictionnaire contenant les statistiques calculées auparavant
+    """
+    # Générez les statistiques à partir des données Nobel
+    statistiques = {
+        "val_manquantes": total_val_manquantes_par_col(donnees),
+        "prct_h_f": pourcentage_hommes_vs_femmes(donnees),
+        "laureat_plus_jeune_et_vieux": plus_jeune_plus_vieux(donnees),
+        "nbre_prix_par_categ": nombre_prix_par_critere(donnees, "category"),
+        "nbre_prix_par_sexe": nombre_prix_par_critere(donnees, "sex"),
+        "nbre_prix_par_pays": nombre_prix_par_critere(donnees, "birth_country_current"),
+        "top20_pays_plus_prix": top20_pays_avec_plus_de_prix(donnees),
+        "topN_org_plus_prix": top_n_organisations_avec_plus_de_prix(donnees, 10),
+        "ville_plus_prix": ville_avec_plus_de_prix(donnees),
+        "laureats_a_plus_prix": laureats_plusieurs_prix(donnees)
+    }
+
+    return statistiques
+#################################################################
+############## Écriture dans des fichiers CSV, Excel et JSON
+#################################################################
+
+def sauvegarder_dans_json(nom_fichier, dico_stats):
+    """
+    Sauvegarde un dictionnaire de statistiques dans un fichier JSON.
+
+    Args:
+        nom_fichier (str): Le nom du fichier JSON dans lequel
+        on sauvegarde les statistiques.
+        dico_stats (dict): Le dictionnaire de statistiques à sauvegarder.
+
+    Returns:
+        None    
+    """
+    with open(nom_fichier, 'w') as json_file:
+        # Ajout de l'indentation pour une meilleure lisibilité
+        json.dump(dico_stats, json_file, indent=4)
+    
+
+def sauvegarder_dans_excel(nom_fichier, dico_stats):
+    """
+    Sauvegarde un dictionnaire de statistiques dans un fichier Excel. 
+    Chaque catégorie (clé) du dictionnaire est sauvegardée dans une feuille distincte.
+
+    Args:
+        nom_fichier (str): Le nom du fichier Excel où les données seront sauvegardées.
+        dico_stats (dict): Le dictionnaire contenant les statistiques à sauvegarder. 
+
+    Returns:
+        None
+    """
+    # Créer un nouveau classeur Excel
+    classeur = openpyxl.Workbook()
+
+    # Itérer sur les différentes catégories du dictionnaire de statistiques
+    for titre, sous_dico in dico_stats.items():
+        # Créer une nouvelle feuille dans le classeur pour chaque catégorie, 
+        # en lui donnant comme nom le titre de la catégorie ou la clé
+        feuille = classeur.create_sheet(title=titre)
+
+        # Vérifier si sous_dico est un dictionnaire
+        if isinstance(sous_dico, dict):
+            for sous_titre, valeur in sous_dico.items():
+                # Si la valeur est aussi un dictionnaire, traiter chaque clé
+                if isinstance(valeur, dict):
+                    feuille.append([sous_titre] + list(valeur.keys()))
+                    feuille.append([''] + list(valeur.values()))
+                else:
+                    feuille.append([sous_titre, valeur])
+        elif isinstance(sous_dico, list):
+            # Vérifier si c'est une liste de listes
+            if sous_dico and isinstance(sous_dico[0], list):
+                for ligne in sous_dico:
+                    feuille.append(ligne)
+            else:
+                # C'est une liste simple, traiter chaque élément comme une ligne
+                for valeur in sous_dico:
+                    feuille.append([valeur])
+
+    # Supprimer la feuille par défaut si elle est vide et n'a pas été remplacée
+    if 'Sheet' in classeur.sheetnames:
+        classeur.remove(classeur.active)
+
+    # Sauvegarder le classeur dans le fichier spécifié
+    classeur.save(nom_fichier)
+
+def sauvegarder_dans_csv(nom_fichier, dico_stats):
+    """
+    Sauvegarde un dictionnaire de statistiques dans un fichier CSV
+
+    Args:
+        nom_fichier (str): Le nom du fichier CSV où les données seront enregistrées.
+        dico_stats (dict): Le dictionnaire contenant les statistiques à sauvegarder.
+
+    Cette fonction crée un fichier CSV et écrit les données directement à partir du dictionnaire,
+    sans vérifications supplémentaires pour les types de données complexes comme les listes ou les sous-dictionnaires.
+    """
+    with open(nom_fichier, mode='w', newline='', encoding='utf-8') as fichier:
+        ecrivain = csv.writer(fichier)
+        ecrivain.writerow(['Catégorie', 'Sous-Catégorie', 'Valeur'])  # En-têtes des colonnes
+
+        #CODE À COMPLÉTER 
+        for categorie, sous_categorie_valeur in dico_stats.items():
+            if isinstance(sous_categorie_valeur, dict):
+                for sous_categorie, valeur in sous_categorie_valeur.items():
+                    ecrivain.writerow([categorie, sous_categorie, valeur])
+            else:
+                ecrivain.writerow([categorie, 'NA', sous_categorie_valeur])
+
+    print(f"Les statistiques ont été sauvegardées dans '{nom_fichier}'.")
+
+##################################################################
+###### Programme principal pour tester vos fonctions
+##################################################################
+
+if __name__ == "__main__":
+    lst_laureats = lecture_fichier("prix_nobel_donnees.csv")
+    categories_prix = recuperer_colonne(lst_laureats, "category")
+    print(categories_prix[:20])
+    col_date_naiss = recuperer_colonne(lst_laureats,"birth_date")
+    print(compter_nbre_val_manquantes(col_date_naiss))
+    print(total_val_manquantes_par_col(lst_laureats))
+    remplacer_val_manquantes(lst_laureats,"sex")
+    col_sex = recuperer_colonne(lst_laureats,"sex")
+    print(col_sex[:40])
+    creer_jeu_donnees_valide(lst_laureats)
+    ajouter_col_age_au_prix(lst_laureats)
+    print(recuperer_colonne(lst_laureats,"age_au_prix")[:20])
+    print(pourcentage_hommes_vs_femmes(lst_laureats))
+    print(plus_jeune_plus_vieux(lst_laureats))
+    print(nombre_prix_par_critere(lst_laureats,"category"))
+    print(top20_pays_avec_plus_de_prix(lst_laureats))
+    print(top_n_organisations_avec_plus_de_prix(lst_laureats,10))
+    print(ville_avec_plus_de_prix(lst_laureats))
+    print(laureats_plusieurs_prix(lst_laureats))
+    
+        </code>
+    </pre>
+</body>
