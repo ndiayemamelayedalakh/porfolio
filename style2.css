@@ -24,12 +24,14 @@ body {
 header {
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: white;
-  padding: 50px 20px;
+  padding: 25px 20px;
   text-align: center;
   backdrop-filter: blur(5px);
   box-shadow: var(--shadow);
+  width: 80%;
+  margin: 20px auto; /* centre le header */
+  border-radius: 20px; /* optionnel mais plus joli */
 }
-
 header h1 {
   margin: 0;
   font-size: 2.8em;
@@ -93,13 +95,14 @@ nav ul li a:hover::after {
 
 /* Sections avec effet de carte flottante */
 section {
-  max-width: 900px;
+  max-width: 70%;
   margin: 50px auto;
   padding: 30px;
   background: white;
   border-radius: 15px;
   box-shadow: var(--shadow);
   transition: var(--transition);
+  font-size: 1.4em;
 }
 
 section:hover {
