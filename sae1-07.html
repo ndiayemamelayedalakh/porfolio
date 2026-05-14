@@ -2,83 +2,119 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title> Reporting & datavisualisation</title>
-  <link rel="stylesheet" href="style2.css">
-   <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-okaidia.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAÉ 1.07 — Reporting Power BI</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>Analyse de données : Mass Shootings aux USA (1982-2024)</h1>
+
+  <header class="projet-header">
+    <div class="projet-header-nav">
+      <a href="index.html" class="logo">MLN<span>.</span></a>
+      <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Retour au portfolio
+      </a>
+    </div>
+    <div class="projet-header-body">
+      <div class="projet-tag">SAÉ 1.07 · Power BI · DAX</div>
+      <h1>Reporting & datavisualisation :<br>Mass Shootings aux USA (1982–2024)</h1>
+    </div>
   </header>
 
-  <section>
-    <h2>Présentation du projet</h2>
-    <p>Dans le cadre de ma formation en Science des Données, j'ai réalisé un projet complet de
-         reporting sur Power BI basé sur les données de l'organisation Mother Jones. L'objectif
-          était de transformer des données brutes et complexes en un outil de pilotage visuel 
-          permettant de dégager des insights significatifs sur les fusillades de masse aux 
-          États-Unis
-</p>
+  <main class="projet-content">
 
-<h2>Démarche</h2>
-<p>
-    Le projet a été réalisé en <strong>travail de groupe (5 personnes)</strong>, avec un 
-    <strong>suivi assuré par des réunions hebdomadaires</strong> pour garantir la cohérence de l'analyse. 
-    Les ressources mobilisées incluent les <strong>méthodes de statistiques descriptives</strong>, 
-    les techniques d'<strong>analyse exploratoire</strong> ainsi que les bonnes pratiques de 
-    <strong>datavisualisation</strong>. 
-  </p>
-  
-  <p>
-    Pour mener à bien l’étude, nous avons utilisé <strong>Microsoft Power BI</strong>, 
-    notamment <strong>Power Query</strong> pour le traitement de données et le langage 
-    <strong>DAX</strong> pour la création d'indicateurs avancés. 
-    Les livrables finaux comprenaient un <strong>rapport interactif (.pbix)</strong> 
-    et la <strong>base de données enrichie</strong>.
-  </p>
-
-  <p>
-    La démarche a débuté par une phase d'<strong>audit des données brutes</strong> (base Mother Jones 1982-2024) 
-    afin d'identifier les types de variables et de corriger les éventuelles incohérences. 
-    Nous avons ensuite défini un <strong>axe d'analyse précis</strong> servant de fil conducteur à notre tableau de bord. 
-    Les données ont été nettoyées et structurées pour permettre une <strong>analyse temporelle et géographique</strong> fiable, 
-    aboutissant à la conception d'un dashboard ergonomique privilégiant la clarté visuelle et la synthèse des insights.
-  </p>
-</div>
-
-    <h2>Acquis</h2>
-<div style="display:flex; gap:30px; align-items:flex-start;">
-
-  <!-- Texte -->
-  <div style="flex:1;">
-    <ul>
-      <li>Traitement de données : nettoyage et structuration de sources brutes avec Power Query.</li>
-      <li>Analyse technique : création d'indicateurs de performance via le langage DAX.</li>
-      <li>Datavisualisation : sélection de graphiques cohérents avec la problématique et les statistiques descriptives.</li>
-      <li>Design : application de règles d'ergonomie et de contraste pour optimiser la clarté du dashboard.</li>
-    </ul>
-
-    <p>
-      J'ai également renforcé ma rigueur dans la gestion des livrables et le respect des standards de présentation professionnelle.
-    </p>
-  </div>
-
-  <!-- Graphique -->
-  <div style="flex:1; text-align:center;">
-    <img src="Images/powerbi.png.png" alt="Graphique de performance" height="300" width="450">
-  </div>
-
-</div>
-   <!-- Boutons de téléchargement -->
-<div class="download-buttons">
-      <a href="Raapports/template.pbix" class="download-btn pdf" target="_blank">Télécharger le rapport PBIX</a>
+    <div class="projet-section">
+      <div class="projet-section-label">Contexte</div>
+      <h2>Présentation du projet</h2>
+      <p>Dans le cadre de ma formation en Science des Données, j'ai réalisé un projet complet de reporting sur <strong>Power BI</strong> basé sur les données de l'organisation Mother Jones. L'objectif était de transformer des données brutes et complexes en un outil de pilotage visuel permettant de dégager des insights significatifs sur les fusillades de masse aux États-Unis entre 1982 et 2024.</p>
     </div>
-  </section>
+
+    <div class="projet-section">
+      <div class="projet-section-label">Méthodologie</div>
+      <h2>Démarche</h2>
+      <p>Le projet a été réalisé en <strong>travail de groupe (5 personnes)</strong>, avec un suivi hebdomadaire pour garantir la cohérence de l'analyse. Outils utilisés : <strong>Microsoft Power BI</strong>, <strong>Power Query</strong> et le langage <strong>DAX</strong>.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-text">
+            <strong>Audit des données brutes</strong>
+            <span>Identification des types de variables et correction des incohérences dans la base Mother Jones 1982–2024.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-text">
+            <strong>Définition de l'axe d'analyse</strong>
+            <span>Définition d'un fil conducteur précis servant de base au tableau de bord.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-text">
+            <strong>Nettoyage & structuration</strong>
+            <span>Traitement avec Power Query pour permettre une analyse temporelle et géographique fiable.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-text">
+            <strong>Conception du dashboard</strong>
+            <span>Création d'indicateurs DAX et design ergonomique privilégiant la clarté visuelle et la synthèse des insights.</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top: 2rem;">
+        <img src="Images/powerbi.png.png" alt="Dashboard Power BI" style="max-width:100%; border-radius: var(--radius); box-shadow: var(--shadow-md);">
+      </div>
+    </div>
+
+    <div class="projet-section">
+      <div class="projet-section-label">Bilan</div>
+      <h2>Ce que j'ai appris</h2>
+      <div class="acquis-grid">
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Traitement de données : <strong>nettoyage et structuration</strong> de sources brutes avec Power Query.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Analyse technique : création d'<strong>indicateurs de performance via DAX</strong>.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Datavisualisation : <strong>sélection de graphiques cohérents</strong> avec la problématique et les statistiques descriptives.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Design : application de règles d'<strong>ergonomie et de contraste</strong> pour optimiser la clarté du dashboard.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Rigueur dans la <strong>gestion des livrables</strong> et le respect des standards de présentation professionnelle.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="projet-section">
+      <div class="projet-section-label">Ressources</div>
+      <h2>Fichiers du projet</h2>
+      <div class="download-buttons">
+        <a href="Raapports/template.pbix" class="download-btn pdf" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Télécharger le rapport PBIX
+        </a>
+      </div>
+    </div>
+
+  </main>
 
   <footer>
-    <p><a href="index.html">Retour à l’accueil</a></p>
+    <div class="logo">Mame Laye Ndiaye</div>
+    <p><a href="index.html">← Retour à l'accueil</a></p>
   </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>

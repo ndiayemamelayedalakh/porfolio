@@ -2,97 +2,193 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Projet Reporting dans un SGBD</title>
-  <link rel="stylesheet" href="style2.css">
-   <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-okaidia.css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAÉ 1.01 — Reporting SGBD</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-okaidia.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Reporting à partir d’un SGBD</h1>
+
+  <!-- EN-TÊTE PROJET -->
+  <header class="projet-header">
+    <div class="projet-header-nav">
+      <a href="index.html" class="logo">MLN<span>.</span></a>
+      <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Retour au portfolio
+      </a>
+    </div>
+    <div class="projet-header-body">
+      <div class="projet-tag">SAÉ 1.01 · SQL · Python</div>
+      <h1>Reporting à partir<br>d'un SGBD</h1>
+    </div>
   </header>
 
-  <section>
-    <h2>Présentation du projet</h2>
-    <p>Dans ce projet nous avons travaillé sur une base
-       de données nommée « victimes_police_US.db »,
-        qui recense les décès survenus lors
-         d’interventions policières aux États-Unis. Cette base contient des informations 
-         détaillées sur les victimes, permettant d’extraire des statistiques précises et pertinentes.</p>
+  <!-- CONTENU -->
+  <main class="projet-content">
 
-    <h2>Démarche</h2>
-    <p>1. <b>Exploration</b> : Analyse de la base de données « victimes_police_US.db » avec SQLite et Python pour identifier les variables clés.<br>
-2. <b>Extraction</b> : Utilisation de requêtes SQL et de scripts Python pour calculer des statistiques
- (répartition démographique, géographique, etc.).<br>
-3. <b>Visualisation </b>: Création de tableaux et graphiques synthétiques pour illustrer les résultats.<br>
-4. <b>Export</b> : Génération d’un fichier Excel structuré avec les données et visualisations.<br>
-5. <b>Validation </b>: Vérification des résultats et documentation pour garantir leur fiabilité.</p>
-Voici un extrait de code pour illustrer notre travail.
-<pre><code class="language-python">
-  def pourcentage_personnes_armees_ou_non(connexion):
+    <!-- Présentation -->
+    <div class="projet-section">
+      <div class="projet-section-label">Contexte</div>
+      <h2>Présentation du projet</h2>
+      <p>
+        Dans ce projet nous avons travaillé sur une base de données nommée
+        <code style="background:var(--accent-dim);color:var(--ink-soft);padding:.1rem .4rem;border-radius:4px;font-size:.85rem;">victimes_police_US.db</code>,
+        qui recense les décès survenus lors d'interventions policières aux États-Unis.
+        Cette base contient des informations détaillées sur les victimes, permettant d'extraire
+        des statistiques précises et pertinentes.
+      </p>
+    </div>
+
+    <!-- Démarche -->
+    <div class="projet-section">
+      <div class="projet-section-label">Méthodologie</div>
+      <h2>Démarche</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-text">
+            <strong>Exploration</strong>
+            <span>Analyse de la base de données avec SQLite et Python pour identifier les variables clés.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-text">
+            <strong>Extraction</strong>
+            <span>Utilisation de requêtes SQL et de scripts Python pour calculer des statistiques (répartition démographique, géographique, etc.).</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-text">
+            <strong>Visualisation</strong>
+            <span>Création de tableaux et graphiques synthétiques pour illustrer les résultats.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-text">
+            <strong>Export</strong>
+            <span>Génération d'un fichier Excel structuré avec les données et visualisations.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">05</div>
+          <div class="step-text">
+            <strong>Validation</strong>
+            <span>Vérification des résultats et documentation pour garantir leur fiabilité.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code -->
+    <div class="projet-section">
+      <div class="projet-section-label">Extrait de code</div>
+      <h2>Exemple de script Python</h2>
+      <p>Voici une fonction illustrant notre approche d'analyse statistique :</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-dot" style="background:#ff5f57;"></div>
+          <div class="code-dot" style="background:#febc2e;"></div>
+          <div class="code-dot" style="background:#28c840;"></div>
+          <span>script_sae1-01.py</span>
+        </div>
+        <pre><code class="language-python">def pourcentage_personnes_armees_ou_non(connexion):
     """
-    Calcule le pourcentage de personnes tuées par la police qui étaient armées ou non.
-
-    Paramètres :
-    ------------
-    connexion : sqlite3.Connection
-        Connexion active à la base de données.
-
-    Retourne :
-    ----------
-    dict
-        {'armee': pourcentage_armes, 'non_armee': pourcentage_non_armes}
+    Calcule le pourcentage de personnes tuées par la police
+    qui étaient armées ou non.
     """
-    curseur = connexion.cursor() # Création d'un curseur
-    # Requête pour obtenir le nombre total d'incidents où l'arme est connue
-    req = """SELECT count(id_incident) AS statut_connu FROM details_incidents 
-              WHERE arme is NOT NULL AND arme != "undetermined";
-          """
+    curseur = connexion.cursor()
+
+    # Nombre total d'incidents où l'arme est connue
+    req = """SELECT count(id_incident) AS statut_connu
+             FROM details_incidents
+             WHERE arme IS NOT NULL AND arme != 'undetermined';"""
     curseur.execute(req)
     total_connu = dict(curseur.fetchone())
-    # Requête pour obtenir le nombre d'incidents où la victime est non armée
-    req = """
-            SELECT count(id_incident) AS vict_non_armee FROM details_incidents
-            WHERE arme = "unarmed" AND arme is NOT NULL;
-          """
+
+    # Nombre d'incidents où la victime est non armée
+    req = """SELECT count(id_incident) AS vict_non_armee
+             FROM details_incidents
+             WHERE arme = 'unarmed' AND arme IS NOT NULL;"""
     curseur.execute(req)
     non_armee = dict(curseur.fetchone())
-    # Calcul des pourcentages des  personnes armees ou non
-    if total_connu['statut_connu'] != 0:  # Verifie si le nbre total de victime est différent de 0
-        prct_non_armee = round(non_armee['vict_non_armee']*100 / total_connu['statut_connu'], 2)
+
+    # Calcul des pourcentages
+    if total_connu['statut_connu'] != 0:
+        prct_non_armee = round(
+            non_armee['vict_non_armee'] * 100 / total_connu['statut_connu'], 2
+        )
         prct_armee = 100 - prct_non_armee
     else:
         prct_non_armee = 0
         prct_armee = 0
-    resultats = {} # Variable qui va contenir le resultat
-    resultats['armee'] = prct_armee
-    resultats['non_armee'] = prct_non_armee
-    
-    return resultats
-</code></pre>
 
-    <h2>Acquis</h2>
-  <ul class="acquis-list">
-    <li>Maîtrise de l'<strong>exploration de bases de données</strong> avec SQLite et Python.</li>
-    <li>Capacité à <strong>extraire et analyser des données</strong> à l'aide de requêtes SQL et de scripts Python (<code>pandas</code>, <code>numpy</code>).</li>
-    <li>Compétence en <strong>visualisation de données</strong> avec des outils comme <code>matplotlib</code> et <code>seaborn</code>.</li>
-    <li>Savoir-faire dans la <strong>création de rapports structurés</strong> avec des tableaux et graphiques synthétiques.</li>
-    <li>Expérience dans l'<strong>export et la mise en forme de données</strong> vers des fichiers Excel.</li>
-    <li>Renforcement des compétences en <strong>validation et documentation</strong> pour garantir la fiabilité des résultats.</li>
-    <li>Capacité à <strong>automatiser des processus d'analyse</strong> pour gagner en efficacité.</li>
-    <li>Compréhension des <strong>enjeux sociétaux</strong> liés aux données analysées.</li>
-  </ul>
-
-   <!-- Boutons de téléchargement -->
-<div class="download-buttons">
-      <a href="Raapports/Rapport_Mathis_Mame_Abdou_Fatou.pdf" class="download-btn pdf" target="_blank">Lire le rapport PDF</a>
-      <a href="Scripts/script_sae1-01.html" class="download-btn script" target="_blank">Voir le script</a>
+    return {'armee': prct_armee, 'non_armee': prct_non_armee}</code></pre>
+      </div>
     </div>
-  </section>
 
+    <!-- Acquis -->
+    <div class="projet-section">
+      <div class="projet-section-label">Bilan</div>
+      <h2>Ce que j'ai appris</h2>
+      <div class="acquis-grid">
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Maîtrise de l'<strong>exploration de bases de données</strong> avec SQLite et Python.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Capacité à <strong>extraire et analyser des données</strong> avec <code>pandas</code> et <code>numpy</code>.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Compétence en <strong>visualisation de données</strong> avec <code>matplotlib</code> et <code>seaborn</code>.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Savoir-faire dans la <strong>création de rapports structurés</strong> avec tableaux et graphiques.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Expérience dans l'<strong>export vers Excel</strong> de données mises en forme.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Compréhension des <strong>enjeux sociétaux</strong> liés aux données analysées.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Téléchargements -->
+    <div class="projet-section">
+      <div class="projet-section-label">Ressources</div>
+      <h2>Fichiers du projet</h2>
+      <div class="download-buttons">
+        <a href="Raapports/Rapport_Mathis_Mame_Abdou_Fatou.pdf" class="download-btn pdf" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Lire le rapport PDF
+        </a>
+        <a href="Scripts/script_sae1-01.html" class="download-btn script" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          Voir le script
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
   <footer>
-    <p><a href="index.html">Retour à l’accueil</a></p>
+    <div class="logo">Mame Laye Ndiaye</div>
+    <p><a href="index.html">← Retour à l'accueil</a></p>
   </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>

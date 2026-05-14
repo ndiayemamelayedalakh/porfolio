@@ -2,91 +2,112 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Projet Écriture et Lecture de Fichiers</title>
-  <link rel="stylesheet" href="style2.css">
-  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-okaidia.css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAÉ 1.03 — Prix Nobel</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-okaidia.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
-
 </head>
 <body>
-  <header>
-    <h1>Écriture et lecture d'un fichier de <br>données avec Python</h1>
+
+  <header class="projet-header">
+    <div class="projet-header-nav">
+      <a href="index.html" class="logo">MLN<span>.</span></a>
+      <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Retour au portfolio
+      </a>
+    </div>
+    <div class="projet-header-body">
+      <div class="projet-tag">SAÉ 1.03 · Python · Openpyxl</div>
+      <h1>Écriture et lecture de fichiers<br>de données avec Python</h1>
+    </div>
   </header>
 
-  <section>
-    <h2>Présentation du projet</h2>
-<p>
-  Ce projet consiste à analyser les données sur <strong>les lauréats des Prix Nobel</strong> à l’aide du langage Python. 
-  À partir du fichier <code>prix_nobel_donnees.csv</code>, nous identifierons les lauréats, leurs contributions et les contextes d’attribution 
-  afin de dégager des <strong>tendances et statistiques pertinentes</strong>. Le projet comprendra l’utilisation du bibliothèques Python 
-  <em>Openpyxl</em>  pour le <strong>nettoyage, la manipulation et l’analyse des données</strong>, dans le but d’améliorer la qualité du jeu de données 
-  et d’en tirer des insights.
-</p>
+  <main class="projet-content">
 
+    <div class="projet-section">
+      <div class="projet-section-label">Contexte</div>
+      <h2>Présentation du projet</h2>
+      <p>Ce projet consiste à analyser les données sur <strong>les lauréats des Prix Nobel</strong> à l'aide du langage Python. À partir du fichier <code style="background:var(--accent-dim);color:var(--ink-soft);padding:.1rem .4rem;border-radius:4px;font-size:.85rem;">prix_nobel_donnees.csv</code>, nous avons identifié les lauréats, leurs contributions et les contextes d'attribution afin de dégager des <strong>tendances et statistiques pertinentes</strong>. Le projet comprend l'utilisation de la bibliothèque <em>Openpyxl</em> pour le <strong>nettoyage, la manipulation et l'analyse des données</strong>.</p>
+    </div>
 
-    <h2>Organisation et démarche</h2>
-<p>
-  Le projet a été réalisé <strong>en groupe de quatre</strong>, avec un <strong>suivi quotidien</strong> et l’appui de diverses ressources 
-  (cours de Python, SAÉ et recherches en ligne). L’analyse a été menée à l’aide de <strong>Python</strong>, et les résultats ont été présentés 
-  dans un <em>rapport Word</em>.
-</p>
+    <div class="projet-section">
+      <div class="projet-section-label">Méthodologie</div>
+      <h2>Organisation et démarche</h2>
+      <p>Le projet a été réalisé <strong>en groupe de quatre</strong>, avec un suivi quotidien. La démarche a commencé par un <strong>nettoyage rigoureux des données</strong> : uniformisation des valeurs manquantes avec des mentions comme <code style="background:var(--accent-dim);color:var(--ink-soft);padding:.1rem .4rem;border-radius:4px;font-size:.85rem;">N/A</code> ou <code style="background:var(--accent-dim);color:var(--ink-soft);padding:.1rem .4rem;border-radius:4px;font-size:.85rem;">Inconnue</code>.</p>
+      <p>Une fois le jeu de données fiabilisé, plusieurs <strong>fonctions Python</strong> ont permis de produire des statistiques clés : répartition hommes-femmes, âge minimal et maximal des lauréats, classement des pays les plus récompensés.</p>
+    </div>
 
-<p>
-  La démarche a commencé par un <strong>nettoyage rigoureux des données</strong>, consistant à <strong>uniformiser les valeurs manquantes</strong> 
-  plutôt qu’à supprimer des enregistrements. Des mentions comme <code>N/A</code> ou <code>Inconnue</code> ont été utilisées selon le type d’information absente. 
-  Une fois le jeu de données fiabilisé, plusieurs <strong>fonctions Python</strong> ont permis de produire des <strong>statistiques clés</strong> : 
-  répartition hommes-femmes, âge minimal et maximal des lauréats, classement des pays et organisations les plus récompensés. 
-  Ces analyses mettent en évidence la <strong>diversité</strong>, la <strong>répartition géographique</strong> et les 
-  <strong>tendances démographiques</strong> des Prix Nobel.
-</p>
-Cet extrait de code illustre concrètement le nettoyage.
-   <pre><code class="language-python">
-    def ajouter_col_age_au_prix(donnees):
+    <div class="projet-section">
+      <div class="projet-section-label">Extrait de code</div>
+      <h2>Exemple de script Python</h2>
+      <p>Cette fonction illustre l'enrichissement du jeu de données par calcul d'âge :</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-dot" style="background:#ff5f57;"></div>
+          <div class="code-dot" style="background:#febc2e;"></div>
+          <div class="code-dot" style="background:#28c840;"></div>
+          <span>script_nobel.py</span>
+        </div>
+        <pre><code class="language-python">def ajouter_col_age_au_prix(donnees):
     """
-    Ajoute une colonne "age_au_prix" au jeu de données, indiquant l'âge du lauréat
-    au moment de l'obtention du prix Nobel. Si la date de naissance est inconnue, 
-    la valeur de "age_au_prix" est fixée à None.
-
-    Args:
-        donnees (list): Liste de dictionnaires
-
-    Returns:
-        None: La fonction modifie directement la liste de dictionnaires en ajoutant
-              une nouvelle clé "age_au_prix" pour chaque lauréat.
+    Ajoute une colonne "age_au_prix" au jeu de données,
+    indiquant l'âge du lauréat au moment de l'obtention du prix Nobel.
+    Si la date de naissance est inconnue, la valeur est fixée à None.
     """
     for laureat in donnees:
-        # Vérifie si la date de naissance est renseignée
         if laureat["birth_date"] != "Inconnue":
             age = laureat["year"] - laureat["birth_date"].year
             laureat['age_au_prix'] = age
         else:
-            # Si la date de naissance est inconnue, on met 'age_au_prix' à None
-            laureat['age_au_prix'] = None
-   </code> </pre>
+            laureat['age_au_prix'] = None</code></pre>
+      </div>
+    </div>
 
+    <div class="projet-section">
+      <div class="projet-section-label">Bilan</div>
+      <h2>Ce que j'ai appris</h2>
+      <p>Ce projet m'a permis de développer plusieurs compétences clés en Python et en analyse de données, notamment la manipulation de structures complexes et la conversion de données.</p>
+      <div class="acquis-grid">
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Maîtrise de l'<strong>exploration et manipulation de données</strong> avec Python.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Capacité à <strong>nettoyer, enrichir et analyser</strong> des jeux de données variés.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Compétence dans l'<strong>exportation de données</strong> en CSV, JSON et Excel via <code>Openpyxl</code>.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Renforcement du <strong>travail collaboratif</strong> et de l'échange de bonnes pratiques.</p>
+        </div>
+      </div>
+    </div>
 
- <h2>Acquis</h2>
-<p>
-Ce projet m’a permis de développer plusieurs compétences clés en <strong>Python</strong> et en analyse de données. 
-<br>J’ai appris à manier des <strong>structures de données complexes</strong> comme les listes imbriquées et les dictionnaires,
- à enchaîner nettoyage, enrichissement et calcul pour produire des statistiques fiables, et à convertir correctement les chaînes 
- en valeurs numériques. 
-</p>
+    <div class="projet-section">
+      <div class="projet-section-label">Ressources</div>
+      <h2>Fichiers du projet</h2>
+      <div class="download-buttons">
+        <a href="Scripts/script_lecture.html" class="download-btn script" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          Voir le script
+        </a>
+      </div>
+    </div>
 
-<ul class="acquis-list">
-  <li>Maîtrise de l'<strong>exploration et manipulation de données</strong> avec Python.</li>
-  <li>Capacité à <strong>nettoyer, enrichir et analyser</strong> des jeux de données variés.</li>
-  <li>Compétence dans <strong>l’exportation de données</strong> en CSV, JSON et Excel via <code>Openpyxl</code>.</li>
-  <li>Renforcement du <strong>travail collaboratif</strong> et de l’échange de bonnes pratiques.</li>
-</ul>
-
-   <!-- Boutons de téléchargement -->
-<a href="Scripts/script_lecture.html" class="download-btn script" target="_blank">Voir le script</a>
-  </section>
+  </main>
 
   <footer>
-    <p><a href="index.html">Retour à l’accueil</a></p>
+    <div class="logo">Mame Laye Ndiaye</div>
+    <p><a href="index.html">← Retour à l'accueil</a></p>
   </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>

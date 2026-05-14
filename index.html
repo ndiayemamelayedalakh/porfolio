@@ -2,91 +2,276 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Portfolio Mame Laye Ndiaye</title>
-  <link rel="stylesheet" href="style2.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio — Mame Laye Ndiaye</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>Portfolio <hr> Mame Laye Ndiaye</h1>
-    <p>BUT Science des Données - Université de Caen Normandie</p>
-    
-  </header>
-<!-- Bouton pour descendre -->
-<div style="text-align: center; margin: 20px 0;">
-  <a href="#realisation" style="text-decoration: none;">
-    <button style="padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #7209b7;">
-      ↓ Voir mes réalisations
-    </button>
-  </a>
-</div>
 
-
-  <section>
-    <h2 >Bienvenue sur mon portfolio !</h2>
-     <p>
- Ce site présente les projets réalisés au cours de mes deux premières années de BUT Science des Données. Ils témoignent de mon implication, de mes compétences techniques et de ma progression dans le domaine de l’analyse et de la valorisation des données.
-
-Passionné par la data science, les statistiques et les outils numériques, je m’intéresse à la façon dont les données peuvent être exploitées pour comprendre, prévoir et optimiser des phénomènes réels. À travers mes travaux, je cherche à développer une approche alliant rigueur
- analytique, curiosité et créativité dans le traitement de l’information.
-  </p>
-
-
-</section>
- <section class="sae-grid" style="background-color: blueviolet;">
-  <h2 id="realisation">Mes réalisations</h2>
-  <div class="grid-container">
-    <div class="sae-card">
-      <img src="Images/sgbd.png" alt="SGBD" height="200" width="200">
-      <h3>Reporting à partir d’un SGBD</h3>
-      
-      <a href="sae1-01.html">Voir plus</a>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-nav">
+      <div class="logo">MLN<span>.</span></div>
+      <nav>
+        <a href="#about">À propos</a>
+        <a href="#competences">Compétences</a>
+        <a href="#formation">Formation</a>
+        <a href="#experience">Expériences</a>
+        <a href="#realisation">Projets</a>
+        <a href="#contact">Contact</a>
+      </nav>
     </div>
-    <div class="sae-card">
-      <img src="Images/jeux_olympique.png" alt="logo JO" width="200" height="170">
-      <h3>Mise en forme et exploration d’un jeu de données</h3>
-      
-      <a href="sae1-02.html">Voir plus</a>
+    <div class="hero-body">
+      <div class="hero-tag">Recherche alternance Data Analyst · Sept. 2026</div>
+      <h1>Mame Laye<br><em>Ndiaye</em></h1>
+      <p class="hero-sub">Étudiant en BUT Science des Données, passionné par l'analyse, la modélisation statistique et la visualisation de données.</p>
+      <a href="#realisation" class="hero-cta">
+        Voir mes projets
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+      </a>
     </div>
-    <div class="sae-card">
-      <img src="Images/prix-nobel.png" alt="prix-nobel" height="180" width="150" >
-      <h3> Écriture et Lecture de Fichiers avec <code>Python</code></h3>
-      <a href="sae1-03.html">Voir plus</a>
+    <div class="hero-scroll">
+      <div class="hero-scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
 
+  <!-- À PROPOS -->
+  <div style="background: var(--surface);" id="about">
+    <div class="section-intro">
+      <div>
+        <div class="section-intro-label">Qui suis-je ?</div>
+        <h2>Rigueur analytique,<br>curiosité & créativité.</h2>
+        <p>Étudiant en BUT Science des Données (parcours Exploration et Modélisation Statistique) à l'IUT Grand Ouest Normandie de Lisieux, je recherche une alternance à partir de septembre 2026. Motivé par les enjeux de modernisation de l'action publique, je veux mettre mes compétences en analyse, traitement et visualisation de données au service du pilotage des politiques publiques.</p>
+      </div>
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-number">7</div>
+          <div class="stat-label">Projets réalisés en 1ère année</div>
+        </div>
+        <div class="stat" style="border-left-color: var(--violet);">
+          <div class="stat-number">BUT</div>
+          <div class="stat-label">Science des Données · IUT Grand Ouest Normandie</div>
+        </div>
+        <div class="stat" style="border-left-color: var(--teal);">
+          <div class="stat-number">SQL · Python · R</div>
+          <div class="stat-label">Outils principaux utilisés</div>
+        </div>
+      </div>
     </div>
-    <div class="sae-card">
-      
-      <img src="Images/sante.png" alt="Imge sante" height="200" width="200">
-      <h3>Gestion de données santé</h3>
-      <a href="sae1-04.html">Voir plus</a>
-    </div>
-    
-    <div class="sae-card">
-      
-      <img src="Images/daccident.png" alt="Imge sante" height="200" width="200" >
-      <h3>Accidents corporels en Normandie</h3>
-      <a href="sae1-05.html">Voir plus</a>
-    </div>
-
-    <div class="sae-card">
-      
-      <img src="Images/fusillade.png" alt="enquête" height="200" width="200" >
-      <h3>Reporting & datavisualisation</h3>
-      <a href="sae1-07.html">Voir plus</a>
-    </div>
-
-        <div class="sae-card">
-      
-      <img src="Images/Depliant.png" alt="enquête" height="200" width="200" >
-      <h3>Mise en œuvre d'une enquête</h3>
-      <a href="sae1-06.html">Voir plus</a>
-    </div>
-    <!-- Ajoute les autres SAÉ ici -->
-     
   </div>
-</section>
+
+  <!-- COMPÉTENCES -->
+  <div style="background: var(--white); padding: 5rem 5vw;" id="competences">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div class="section-intro-label" style="text-align:center; margin-bottom:.75rem;">Savoir-faire</div>
+      <h2 style="font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(2rem,4vw,3rem); letter-spacing:-.03em; text-align:center; margin-bottom:3rem;">Compétences & outils</h2>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(270px,1fr)); gap:1.5rem;">
+
+        <!-- Visualisation -->
+        <div class="skill-card">
+          <div class="skill-icon">📊</div>
+          <div class="skill-title">Visualisation</div>
+          <div class="skill-tags">
+            <span class="tag">Power BI</span>
+            <span class="tag">DAX</span>
+            <span class="tag">Qlik Sense</span>
+            <span class="tag">Excel (VBA, Power Query, Power Pivot)</span>
+          </div>
+        </div>
+
+        <!-- Analyse de données -->
+        <div class="skill-card">
+          <div class="skill-icon">📈</div>
+          <div class="skill-title">Analyse de données</div>
+          <div class="skill-tags">
+            <span class="tag">Statistiques descriptives</span>
+            <span class="tag">Statistiques inférentielles</span>
+            <span class="tag">Modélisation</span>
+            <span class="tag">Régression linéaire</span>
+            <span class="tag">Techniques de sondage</span>
+          </div>
+        </div>
+
+        <!-- Programmation -->
+        <div class="skill-card">
+          <div class="skill-icon">💻</div>
+          <div class="skill-title">Programmation</div>
+          <div class="skill-tags">
+            <span class="tag">Python</span>
+            <span class="tag">R</span>
+            <span class="tag">SQL</span>
+            <span class="tag">SAS</span>
+            <span class="tag">VBA</span>
+          </div>
+        </div>
+
+        <!-- Développement web -->
+        <div class="skill-card">
+          <div class="skill-icon">🌐</div>
+          <div class="skill-title">Développement web</div>
+          <div class="skill-tags">
+            <span class="tag">HTML</span>
+            <span class="tag">CSS</span>
+            <span class="tag">JavaScript</span>
+          </div>
+        </div>
+
+        <!-- Outils -->
+        <div class="skill-card">
+          <div class="skill-icon">🛠️</div>
+          <div class="skill-title">Autres outils</div>
+          <div class="skill-tags">
+            <span class="tag">Git / GitHub</span>
+            <span class="tag">LaTeX</span>
+            <span class="tag">Marp</span>
+            <span class="tag">Gantt</span>
+            <span class="tag">RGPD</span>
+          </div>
+        </div>
+
+        <!-- Langues -->
+        <div class="skill-card">
+          <div class="skill-icon">🗣️</div>
+          <div class="skill-title">Langues</div>
+          <div class="skill-tags">
+            <span class="tag">Français — Courant</span>
+            <span class="tag">Anglais — B1/B2</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMATION -->
+  <div style="background: var(--surface); padding: 5rem 5vw;" id="formation">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div class="section-intro-label" style="margin-bottom:.75rem;">Parcours académique</div>
+      <h2 style="font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(2rem,4vw,3rem); letter-spacing:-.03em; margin-bottom:3rem;">Formation</h2>
+
+      <div style="display:flex; flex-direction:column; gap:1.5rem; max-width:800px;">
+
+        <div class="timeline-card">
+          <div class="timeline-year">2024 – 2027</div>
+          <div class="timeline-body">
+            <div class="timeline-title">BUT Science des Données</div>
+            <div class="timeline-subtitle">Parcours Exploration et Modélisation Statistique</div>
+            <div class="timeline-place">IUT Grand Ouest Normandie · Lisieux</div>
+          </div>
+        </div>
+
+        <div class="timeline-card">
+          <div class="timeline-year">2024</div>
+          <div class="timeline-body">
+            <div class="timeline-title">Licence Mathématiques, Physique et Informatique</div>
+            <div class="timeline-subtitle">Première année validée</div>
+            <div class="timeline-place">Université Gaston Berger · Sénégal</div>
+          </div>
+        </div>
+
+        <div class="timeline-card">
+          <div class="timeline-year">2023</div>
+          <div class="timeline-body">
+            <div class="timeline-title">Baccalauréat général — Mention Bien</div>
+            <div class="timeline-subtitle">Spécialités : Mathématiques & Physique-Chimie</div>
+            <div class="timeline-place">Lycée Demba Diop · Mbour, Sénégal</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPÉRIENCES -->
+  <div style="background: var(--white); padding: 5rem 5vw;" id="experience">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div class="section-intro-label" style="margin-bottom:.75rem;">Parcours professionnel</div>
+      <h2 style="font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(2rem,4vw,3rem); letter-spacing:-.03em; margin-bottom:3rem;">Expériences</h2>
+
+      <div style="display:flex; flex-direction:column; gap:1.5rem; max-width:800px;">
+
+        <div class="timeline-card" style="border-left-color: var(--teal);">
+          <div class="timeline-year" style="color:var(--teal);">Avril 2026</div>
+          <div class="timeline-body">
+            <div class="timeline-title">Stage — Data Analyst</div>
+            <div class="timeline-subtitle">Traitement de données clients, analyse et reporting</div>
+            <div class="timeline-place">Crédit Agricole · Caen</div>
+          </div>
+        </div>
+
+        <div class="timeline-card">
+          <div class="timeline-year">2025</div>
+          <div class="timeline-body">
+            <div class="timeline-title">Équipier polyvalent</div>
+            <div class="timeline-subtitle">Service client, gestion des flux, coordination d'équipe, respect des procédures</div>
+            <div class="timeline-place">Burger King · Lisieux</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- RÉALISATIONS -->
+  <section class="realisations" id="realisation">
+    <div class="realisations-header">
+      <h2>Mes<br><span>réalisations</span></h2>
+    </div>
+    <div class="grid">
+      <a class="card" href="sae1-01.html"><div class="card-icon">🗄️</div><div class="card-number">SAÉ 1.01</div><h3>Reporting à partir d'un SGBD</h3><div class="card-arrow">Voir le projet →</div></a>
+      <a class="card" href="sae1-02.html"><div class="card-icon">🏅</div><div class="card-number">SAÉ 1.02</div><h3>Mise en forme et exploration d'un jeu de données</h3><div class="card-arrow">Voir le projet →</div></a>
+      <a class="card" href="sae1-03.html"><div class="card-icon">🐍</div><div class="card-number">SAÉ 1.03</div><h3>Écriture et lecture de fichiers avec Python</h3><div class="card-arrow">Voir le projet →</div></a>
+      <a class="card" href="sae1-04.html"><div class="card-icon">🏥</div><div class="card-number">SAÉ 1.04</div><h3>Gestion de données santé</h3><div class="card-arrow">Voir le projet →</div></a>
+      <a class="card" href="sae1-05.html"><div class="card-icon">🚗</div><div class="card-number">SAÉ 1.05</div><h3>Accidents corporels en Normandie</h3><div class="card-arrow">Voir le projet →</div></a>
+      <a class="card" href="sae1-07.html"><div class="card-icon">📊</div><div class="card-number">SAÉ 1.07</div><h3>Reporting & datavisualisation</h3><div class="card-arrow">Voir le projet →</div></a>
+      <a class="card" href="sae1-06.html"><div class="card-icon">📋</div><div class="card-number">SAÉ 1.06</div><h3>Mise en œuvre d'une enquête</h3><div class="card-arrow">Voir le projet →</div></a>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <div style="background: var(--surface); padding: 5rem 5vw;" id="contact">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div class="section-intro-label" style="text-align:center; margin-bottom:.75rem;">Me contacter</div>
+      <h2 style="font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(2rem,4vw,3rem); letter-spacing:-.03em; text-align:center; margin-bottom:3rem;">Contact</h2>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap:1.5rem; max-width:900px; margin:0 auto;">
+
+        <a href="tel:+33629449228" class="contact-card">
+          <div class="contact-icon">📞</div>
+          <div class="contact-label">Téléphone</div>
+          <div class="contact-value">06 29 44 92 28</div>
+        </a>
+
+        <a href="mailto:ndiayemamelayedalakh@gmail.com" class="contact-card">
+          <div class="contact-icon">✉️</div>
+          <div class="contact-label">Email</div>
+          <div class="contact-value">ndiayemamelayedalakh<br>@gmail.com</div>
+        </a>
+
+        <a href="https://linkedin.com/in/mame-laye-ndiaye" target="_blank" class="contact-card">
+          <div class="contact-icon">💼</div>
+          <div class="contact-label">LinkedIn</div>
+          <div class="contact-value">mame-laye-ndiaye</div>
+        </a>
+
+        <a href="https://github.com/ndiayemamelayedalakh" target="_blank" class="contact-card">
+          <div class="contact-icon">🐙</div>
+          <div class="contact-label">GitHub</div>
+          <div class="contact-value">ndiayemamelayedalakh</div>
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
   <footer>
-    <p>© Mame Laye Ndiaye</p>
+    <div class="logo">Mame Laye Ndiaye</div>
+    <p>© 2025 · BUT Science des Données · IUT Grand Ouest Normandie</p>
   </footer>
- 
+
+  <script src="script.js"></script>
 </body>
 </html>

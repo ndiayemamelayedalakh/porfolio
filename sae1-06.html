@@ -2,62 +2,116 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title> Mise en œuvre d’une enquête </title>
-  <link rel="stylesheet" href="style2.css">
-   <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-okaidia.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAÉ 1.06 — Enquête médias</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>Analyse des pratiques médiatiques et de leur influence </h1>
+
+  <header class="projet-header">
+    <div class="projet-header-nav">
+      <a href="index.html" class="logo">MLN<span>.</span></a>
+      <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Retour au portfolio
+      </a>
+    </div>
+    <div class="projet-header-body">
+      <div class="projet-tag">SAÉ 1.06 · R · LaTeX · Enquête</div>
+      <h1>Analyse des pratiques médiatiques<br>et de leur influence</h1>
+    </div>
   </header>
 
-  <section>
-    <h2>Présentation du projet</h2>
-    <p>Ce projet d’enquête analyse l’impact des médias sur les lycéens. À partir d’un questionnaire 
-        administré auprès d’un échantillon de lycéens, il étudie leurs habitudes de consommation 
-        médiatique et la manière dont ces contenus influencent leur perception de l’actualité et de
-         la société. Les données recueillies seront traitées statistiquement sous R afin de dégager
-          des tendances et des informations pertinentes.
-</p>
+  <main class="projet-content">
 
-<h2>Démarche</h2>
-<p>Le projet a été réalisé en <strong>travail de groupe (4 personnes)</strong>, avec un
-     <strong>suivi assuré par des réunions hebdomadaires</strong>. Les ressources mobilisées 
-     incluent les <strong>cours de statistique</strong>, les <strong>TP d’analyse statistique
-     </strong> ainsi que diverses <strong>recherches en ligne</strong>. Pour mener à bien l’étude,
-      nous avons utilisé plusieurs outils : <strong>RStudio</strong>, <strong>Excel</strong> et
-       <strong>LaTeX</strong>. Les livrables attendus étaient un <strong>rapport rédigé en LaTeX
-       </strong> et une <strong>présentation orale réalisée avec Marp</strong>.</p><p>La démarche 
-        a débuté par une <strong>collecte de données dans un lycée</strong>, à l’aide d’un 
-        questionnaire administré auprès des élèves. Nous avons ensuite construit un <strong>dictionnaire
-             de variables</strong> afin de structurer les réponses et de les intégrer dans un fichier Excel
-             , ultérieurement enregistré au format <strong>CSV</strong> pour faciliter l’analyse exploratoire.
-              Les données ont été traitées à l’aide de <strong>méthodes statistiques appropriées sous RStudio</strong>,
-               ce qui nous a permis d’identifier les tendances principales et de répondre aux différentes questions
-                statistiques posées par le projet.</p>
-Voici un extrait de graphique pour illustrer notre travail.
- <div style="text-align: center;">
-  <img src="Images/TOP_3_MEDIAS.png" alt="Illustration" height="400" width="600">
-</div>
-
-    <h2>Acquis</h2>
-<p>
-Ce projet nous a permis de découvrir concrètement l’analyse statistique, depuis la collecte
- et le nettoyage des données jusqu’à l’interprétation des résultats. Nous avons également appris à
-  utiliser plusieurs outils essentiels comme <strong>RStudio</strong>, <strong>Excel</strong>,
-   <strong>LaTeX</strong> et <strong>Marp</strong>. Le graphique ci-dessous illustre une partie de
-    l’analyse réalisée sous R et montre notre capacité à transformer des données brutes en informations utiles.
-</p>
-   <!-- Boutons de téléchargement -->
-<div class="download-buttons">
-      <a href="Raapports/Rapport_Latex__medias.pdf" class="download-btn pdf" target="_blank">Lire le rapport PDF</a>
+    <div class="projet-section">
+      <div class="projet-section-label">Contexte</div>
+      <h2>Présentation du projet</h2>
+      <p>Ce projet d'enquête analyse l'impact des médias sur les lycéens. À partir d'un questionnaire administré auprès d'un échantillon de lycéens, il étudie leurs habitudes de consommation médiatique et la manière dont ces contenus influencent leur perception de l'actualité et de la société. Les données recueillies ont été traitées statistiquement sous R afin de dégager des tendances et des informations pertinentes.</p>
     </div>
-  </section>
+
+    <div class="projet-section">
+      <div class="projet-section-label">Méthodologie</div>
+      <h2>Démarche</h2>
+      <p>Le projet a été réalisé en <strong>travail de groupe (4 personnes)</strong>, avec un suivi assuré par des réunions hebdomadaires. Les outils utilisés : <strong>RStudio</strong>, <strong>Excel</strong> et <strong>LaTeX</strong>.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-text">
+            <strong>Collecte</strong>
+            <span>Administration d'un questionnaire auprès des élèves d'un lycée.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-text">
+            <strong>Structuration</strong>
+            <span>Construction d'un dictionnaire de variables et intégration dans un fichier Excel converti en CSV.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-text">
+            <strong>Analyse statistique</strong>
+            <span>Traitement des données avec des méthodes statistiques sous RStudio pour identifier les tendances principales.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-text">
+            <strong>Restitution</strong>
+            <span>Rapport rédigé en LaTeX et présentation orale réalisée avec Marp.</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top: 2rem;">
+        <img src="Images/TOP_3_MEDIAS.png" alt="Graphique Top 3 médias" style="max-width:100%; border-radius: var(--radius); box-shadow: var(--shadow-md);">
+      </div>
+    </div>
+
+    <div class="projet-section">
+      <div class="projet-section-label">Bilan</div>
+      <h2>Ce que j'ai appris</h2>
+      <p>Ce projet nous a permis de découvrir concrètement l'analyse statistique, depuis la collecte et le nettoyage des données jusqu'à l'interprétation des résultats, en utilisant des outils essentiels comme RStudio, Excel, LaTeX et Marp.</p>
+      <div class="acquis-grid">
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Conception et administration d'un <strong>questionnaire d'enquête</strong> auprès d'un public cible.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Maîtrise du cycle complet : <strong>collecte → nettoyage → analyse → restitution</strong>.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Utilisation de <strong>RStudio</strong> pour transformer des données brutes en informations utiles.</p>
+        </div>
+        <div class="acquis-item">
+          <div class="acquis-dot"></div>
+          <p>Rédaction d'un <strong>rapport scientifique structuré</strong> avec LaTeX.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="projet-section">
+      <div class="projet-section-label">Ressources</div>
+      <h2>Fichiers du projet</h2>
+      <div class="download-buttons">
+        <a href="Raapports/Rapport_Latex__medias.pdf" class="download-btn pdf" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Lire le rapport PDF
+        </a>
+      </div>
+    </div>
+
+  </main>
 
   <footer>
-    <p><a href="index.html">Retour à l’accueil</a></p>
+    <div class="logo">Mame Laye Ndiaye</div>
+    <p><a href="index.html">← Retour à l'accueil</a></p>
   </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
